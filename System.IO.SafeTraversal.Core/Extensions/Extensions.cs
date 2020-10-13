@@ -279,7 +279,7 @@ namespace System.IO.SafeTraversal.Core
                 return ExTraverseFilesCore(path, filter);
         }
 
-             /// <summary>
+        /// <summary>
         /// Iterate top level directories.
         /// </summary>
         /// <param name="path">Target path.</param>
@@ -304,14 +304,10 @@ namespace System.IO.SafeTraversal.Core
         /// <exception cref="DirectoryNotFoundException">`path` doesn't exist.</exception>
         public static IEnumerable<DirectoryInfo> GetDirectories(DirectoryInfo path, SearchOption searchOption)
         {
-            if (path == null)
-                throw new ArgumentNullException(nameof(path), "`path` cannot be null");
-            if (!path.Exists)
-                throw new DirectoryNotFoundException($"{path.FullName} doesn't exist");
-            if (searchOption == SearchOption.TopDirectoryOnly)
-                return ExTopLevelDirectoriesTraversal(path);
-            else
-                return ExTraverseDirectoriesCore(path);
+            if (path == null) throw new ArgumentNullException(nameof(path), "`path` cannot be null");
+            if (!path.Exists) throw new DirectoryNotFoundException($"{path.FullName} doesn't exist");
+
+            return searchOption == SearchOption.TopDirectoryOnly ? ExTopLevelDirectoriesTraversal(path) : ExTraverseDirectoriesCore(path);
         }
         /// <summary>
         /// Iterate directories using search option and custom filter.
@@ -325,18 +321,13 @@ namespace System.IO.SafeTraversal.Core
         /// <exception cref="ArgumentNullException">`filter` cannot be null.</exception> 
         public static IEnumerable<DirectoryInfo> GetDirectories(DirectoryInfo path, SearchOption searchOption, Func<DirectoryInfo, bool> filter)
         {
-            if (path == null)
-                throw new ArgumentNullException(nameof(path), "`path` cannot be null");
-            if (!path.Exists)
-                throw new DirectoryNotFoundException($"{path.FullName} doesn't exist");
-            if (filter == null)
-                throw new ArgumentNullException(nameof(filter), "`filter` cannot be null");
+            if (path == null) throw new ArgumentNullException(nameof(path), "`path` cannot be null");
+            if (!path.Exists) throw new DirectoryNotFoundException($"{path.FullName} doesn't exist");
+            if (filter == null) throw new ArgumentNullException(nameof(filter), "`filter` cannot be null");
 
-
-            if (searchOption == SearchOption.TopDirectoryOnly)
-                return ExTopLevelDirectoriesTraversal(path, filter);
-            else
-                return ExTraverseDirectoriesCore(path, filter);
+            return searchOption == SearchOption.TopDirectoryOnly
+                ? ExTopLevelDirectoriesTraversal(path, filter)
+                : ExTraverseDirectoriesCore(path, filter);
         }
         /// <summary>
         /// Iterate directories using search option and directory attributes.
@@ -349,18 +340,15 @@ namespace System.IO.SafeTraversal.Core
         /// <exception cref="DirectoryNotFoundException">`path` doesn't exist.</exception>
         public static IEnumerable<DirectoryInfo> GetDirectories(DirectoryInfo path, SearchOption searchOption, FileAttributes attributes)
         {
+            if (path == null) throw new ArgumentNullException(nameof(path), "`path` cannot be null");
+            if (!path.Exists) throw new DirectoryNotFoundException($"{path.FullName} doesn't exist");
 
-            if (path == null)
-                throw new ArgumentNullException(nameof(path), "`path` cannot be null");
-            if (!path.Exists)
-                throw new DirectoryNotFoundException($"{path.FullName} doesn't exist");
             Func<DirectoryInfo, bool> filter = (dirInfo) => MatchDirByAttributesEx(dirInfo, attributes);
-            if (searchOption == SearchOption.TopDirectoryOnly)
-                return ExTopLevelDirectoriesTraversal(path, filter);
-            else
-                return ExTraverseDirectoriesCore(path, filter);
-        }
 
+            return searchOption == SearchOption.TopDirectoryOnly
+                ? ExTopLevelDirectoriesTraversal(path, filter)
+                : ExTraverseDirectoriesCore(path, filter);
+        }
 
         /// <summary>
         /// Iterate directories using search option and filters based on date (creation, last access, last modified).
@@ -374,18 +362,15 @@ namespace System.IO.SafeTraversal.Core
         /// <exception cref="ArgumentNullException">`searchDirectoryByDateOption` cannot be null.</exception> 
         public static IEnumerable<DirectoryInfo> GetDirectories(DirectoryInfo path, SearchOption searchOption, SearchDirectoryByDateOption searchDirectoryByDateOption)
         {
-            if (path == null)
-                throw new ArgumentNullException(nameof(path), "`path` cannot be null");
-            if (!path.Exists)
-                throw new DirectoryNotFoundException($"{path.FullName} doesn't exist");
-            if (searchDirectoryByDateOption == null)
-                throw new ArgumentNullException(nameof(searchDirectoryByDateOption), "`searchDirectoryByDateOption` cannot be null");
+            if (path == null) throw new ArgumentNullException(nameof(path), "`path` cannot be null");
+            if (!path.Exists) throw new DirectoryNotFoundException($"{path.FullName} doesn't exist");
+            if (searchDirectoryByDateOption == null) throw new ArgumentNullException(nameof(searchDirectoryByDateOption), "`searchDirectoryByDateOption` cannot be null");
 
             Func<DirectoryInfo, bool> filter = (dirInfo) => MatchDirByDateEx(dirInfo, searchDirectoryByDateOption.Date, searchDirectoryByDateOption.DateComparisonType);
-            if (searchOption == SearchOption.TopDirectoryOnly)
-                return ExTopLevelDirectoriesTraversal(path, filter);
-            else
-                return ExTraverseDirectoriesCore(path, filter);
+
+            return searchOption == SearchOption.TopDirectoryOnly 
+                ? ExTopLevelDirectoriesTraversal(path, filter) 
+                : ExTraverseDirectoriesCore(path, filter);
         }
 
         /// <summary>
@@ -732,7 +717,7 @@ namespace System.IO.SafeTraversal.Core
         }
 
 
-               /// <summary>
+        /// <summary>
         /// Iterate top level directories.
         /// </summary>
         /// <param name="path">Target path.</param>

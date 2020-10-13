@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
+
 namespace System.IO.SafeTraversal.Core
 {
     public partial class SafeTraversal
@@ -15,22 +16,13 @@ namespace System.IO.SafeTraversal.Core
             try
             {
                 double result = 0;
-                int power = 0;
-                power = (int)type;
-                if (size == 0)
-                    size = +1;
+                if (size == 0) size = +1;
                 switch (converterType)
                 {
-                    case SizeConverterType.LowerBound:
-                        result = Math.Floor(((size - 1) * Math.Pow(1024, power)));
-                        break;
-                    case SizeConverterType.UpperBound:
-                        result = Math.Ceiling(((size + 1) * Math.Pow(1024, power)));
-                        break;
+                    case SizeConverterType.LowerBound: result = Math.Floor((size - 1) * Math.Pow(1024, (int)type)); break;
+                    case SizeConverterType.UpperBound: result = Math.Ceiling((size + 1) * Math.Pow(1024, (int)type)); break;
                 }
-                if (result >= (double)long.MaxValue)
-                    return -1;
-                return Convert.ToInt64(result);
+                return result >= long.MaxValue ? -1 : Convert.ToInt64(result);
             }
             catch { return -1; }
         }
@@ -39,51 +31,28 @@ namespace System.IO.SafeTraversal.Core
             try
             {
                 double result = 0;
-                int power = 0;
-                power = (int)type;
-                if (size == 0)
-                    size = +1;
+                if (size == 0) size = +1;
                 switch (converterType)
                 {
-                    case SizeConverterType.LowerBound:
-                        result = Math.Floor(((size - 1) * Math.Pow(1024, power)));
-                        break;
-                    case SizeConverterType.UpperBound:
-                        result = Math.Ceiling(((size + 1) * Math.Pow(1024, power)));
-                        break;
+                    case SizeConverterType.LowerBound: result = Math.Floor((size - 1) * Math.Pow(1024, (int)type)); break;
+                    case SizeConverterType.UpperBound: result = Math.Ceiling((size + 1) * Math.Pow(1024, (int)type)); break;
                 }
-                if (result >= (double)long.MaxValue)
-                    return -1;
-                return Convert.ToInt64(result);
+                return result >= long.MaxValue ? -1 : Convert.ToInt64(result);
             }
             catch { return -1; }
         }
 
         private bool MatchBySize(FileInfo fileInfo, double size, SizeType sizeType)
         {
-            long lowerBound = SizeConverter(size, sizeType, SizeConverterType.LowerBound);
-
-            if (lowerBound < 0)
-                return false;
-
-            long upperBound = SizeConverter(size, sizeType, SizeConverterType.UpperBound);
-
-            if (upperBound < 0)
-                return false;
+            long lowerBound = SizeConverter(size, sizeType, SizeConverterType.LowerBound); if (lowerBound < 0) return false;
+            long upperBound = SizeConverter(size, sizeType, SizeConverterType.UpperBound); if (upperBound < 0) return false;
 
             return (fileInfo.Length >= lowerBound && fileInfo.Length <= upperBound);
         }
         private static bool MatchBySizeEx(FileInfo fileInfo, double size, SizeType sizeType)
         {
-            long lowerBound = SizeConverterEx(size, sizeType, SizeConverterType.LowerBound);
-
-            if (lowerBound < 0)
-                return false;
-
-            long upperBound = SizeConverterEx(size, sizeType, SizeConverterType.UpperBound);
-
-            if (upperBound < 0)
-                return false;
+            long lowerBound = SizeConverterEx(size, sizeType, SizeConverterType.LowerBound); if (lowerBound < 0) return false;
+            long upperBound = SizeConverterEx(size, sizeType, SizeConverterType.UpperBound); if (upperBound < 0) return false;
 
             return (fileInfo.Length >= lowerBound && fileInfo.Length <= upperBound);
         }
@@ -91,35 +60,27 @@ namespace System.IO.SafeTraversal.Core
         private bool MatchBySizeRange(FileInfo fileInfo, double lowerBoundSize, double upperBoundSize, SizeType sizeType)
         {
             lowerBoundSize++;
-            if (lowerBoundSize < 0)
-                return false;
-            if (upperBoundSize < 0)
-                return false;
-            if (lowerBoundSize >= upperBoundSize)
-                return false;
-            long lowerBound = SizeConverter(lowerBoundSize, sizeType, SizeConverterType.LowerBound);
-            if (lowerBound < 0)
-                return false;
-            long upperBound = SizeConverter(upperBoundSize, sizeType, SizeConverterType.UpperBound);
-            if (upperBound < 0)
-                return false;
+
+            if (lowerBoundSize < 0) return false;
+            if (upperBoundSize < 0) return false;
+            if (lowerBoundSize >= upperBoundSize) return false;
+
+            long lowerBound = SizeConverter(lowerBoundSize, sizeType, SizeConverterType.LowerBound); if (lowerBound < 0) return false;
+            long upperBound = SizeConverter(upperBoundSize, sizeType, SizeConverterType.UpperBound); if (upperBound < 0) return false;
+
             return (fileInfo.Length >= lowerBound && fileInfo.Length <= upperBound);
         }
         private static bool MatchBySizeRangeEx(FileInfo fileInfo, double lowerBoundSize, double upperBoundSize, SizeType sizeType)
         {
             lowerBoundSize++;
-            if (lowerBoundSize < 0)
-                return false;
-            if (upperBoundSize < 0)
-                return false;
-            if (lowerBoundSize >= upperBoundSize)
-                return false;
-            long lowerBound = SizeConverterEx(lowerBoundSize, sizeType, SizeConverterType.LowerBound);
-            if (lowerBound < 0)
-                return false;
-            long upperBound = SizeConverterEx(upperBoundSize, sizeType, SizeConverterType.UpperBound);
-            if (upperBound < 0)
-                return false;
+
+            if (lowerBoundSize < 0) return false;
+            if (upperBoundSize < 0) return false;
+            if (lowerBoundSize >= upperBoundSize) return false;
+
+            long lowerBound = SizeConverterEx(lowerBoundSize, sizeType, SizeConverterType.LowerBound); if (lowerBound < 0) return false;
+            long upperBound = SizeConverterEx(upperBoundSize, sizeType, SizeConverterType.UpperBound); if (upperBound < 0) return false;
+
             return (fileInfo.Length >= lowerBound && fileInfo.Length <= upperBound);
         }
 
@@ -128,15 +89,9 @@ namespace System.IO.SafeTraversal.Core
             DateTime fileInfoDate = new DateTime();
             switch (comparisonType)
             {
-                case DateComparisonType.CreationDate:
-                    fileInfoDate = fileInfo.CreationTime.Date;
-                    break;
-                case DateComparisonType.LastModificationDate:
-                    fileInfoDate = fileInfo.LastWriteTime.Date;
-                    break;
-                case DateComparisonType.LastAccessDate:
-                    fileInfoDate = fileInfo.LastAccessTime.Date;
-                    break;
+                case DateComparisonType.CreationDate: fileInfoDate = fileInfo.CreationTime.Date; break;
+                case DateComparisonType.LastModificationDate: fileInfoDate = fileInfo.LastWriteTime.Date; break;
+                case DateComparisonType.LastAccessDate: fileInfoDate = fileInfo.LastAccessTime.Date; break;
             }
             return DateTime.Equals(fileInfoDate.Date, dateTime.Date);
         }
@@ -145,15 +100,9 @@ namespace System.IO.SafeTraversal.Core
             DateTime fileInfoDate = new DateTime();
             switch (comparisonType)
             {
-                case DateComparisonType.CreationDate:
-                    fileInfoDate = fileInfo.CreationTime.Date;
-                    break;
-                case DateComparisonType.LastModificationDate:
-                    fileInfoDate = fileInfo.LastWriteTime.Date;
-                    break;
-                case DateComparisonType.LastAccessDate:
-                    fileInfoDate = fileInfo.LastAccessTime.Date;
-                    break;
+                case DateComparisonType.CreationDate: fileInfoDate = fileInfo.CreationTime.Date; break;
+                case DateComparisonType.LastModificationDate: fileInfoDate = fileInfo.LastWriteTime.Date; break;
+                case DateComparisonType.LastAccessDate: fileInfoDate = fileInfo.LastAccessTime.Date; break;
             }
             return DateTime.Equals(fileInfoDate.Date, dateTime.Date);
         }
@@ -163,15 +112,9 @@ namespace System.IO.SafeTraversal.Core
             DateTime fileInfoDate = new DateTime();
             switch (comparisonType)
             {
-                case DateComparisonType.CreationDate:
-                    fileInfoDate = fileInfo.CreationTime.Date;
-                    break;
-                case DateComparisonType.LastModificationDate:
-                    fileInfoDate = fileInfo.LastWriteTime.Date;
-                    break;
-                case DateComparisonType.LastAccessDate:
-                    fileInfoDate = fileInfo.LastAccessTime.Date;
-                    break;
+                case DateComparisonType.CreationDate: fileInfoDate = fileInfo.CreationTime.Date; break;
+                case DateComparisonType.LastModificationDate: fileInfoDate = fileInfo.LastWriteTime.Date; break;
+                case DateComparisonType.LastAccessDate: fileInfoDate = fileInfo.LastAccessTime.Date; break;
             }
             return (fileInfoDate >= lowerBoundDate.Date && fileInfoDate <= upperBoundDate.Date);
         }
@@ -180,57 +123,39 @@ namespace System.IO.SafeTraversal.Core
             DateTime fileInfoDate = new DateTime();
             switch (comparisonType)
             {
-                case DateComparisonType.CreationDate:
-                    fileInfoDate = fileInfo.CreationTime.Date;
-                    break;
-                case DateComparisonType.LastModificationDate:
-                    fileInfoDate = fileInfo.LastWriteTime.Date;
-                    break;
-                case DateComparisonType.LastAccessDate:
-                    fileInfoDate = fileInfo.LastAccessTime.Date;
-                    break;
+                case DateComparisonType.CreationDate: fileInfoDate = fileInfo.CreationTime.Date; break;
+                case DateComparisonType.LastModificationDate: fileInfoDate = fileInfo.LastWriteTime.Date; break;
+                case DateComparisonType.LastAccessDate: fileInfoDate = fileInfo.LastAccessTime.Date; break;
             }
             return (fileInfoDate >= lowerBoundDate.Date && fileInfoDate <= upperBoundDate.Date);
         }
 
         private bool MatchByPattern(FileInfo fileInfo, string pattern)
         {
-            bool result = false;
-            try
-            {
-                result = Regex.IsMatch(Path.GetFileNameWithoutExtension(fileInfo.Name), pattern, RegexOptions.Compiled);
-            }
+            bool result; // = false;
+            try { result = Regex.IsMatch(Path.GetFileNameWithoutExtension(fileInfo.Name), pattern, RegexOptions.Compiled); }
             catch { result = false; }
             return result;
         }
         private static bool MatchByPatternEx(FileInfo fileInfo, string pattern)
         {
-            bool result = false;
-            try
-            {
-                result = Regex.IsMatch(Path.GetFileNameWithoutExtension(fileInfo.Name), pattern, RegexOptions.Compiled);
-            }
+            bool result; // = false;
+            try { result = Regex.IsMatch(Path.GetFileNameWithoutExtension(fileInfo.Name), pattern, RegexOptions.Compiled); }
             catch { result = false; }
             return result;
         }
 
         private bool MatchByPatternWithExtension(FileInfo fileInfo, string pattern)
         {
-            bool result = false;
-            try
-            {
-                result = Regex.IsMatch(fileInfo.Name, pattern, RegexOptions.Compiled);
-            }
+            bool result; // = false;
+            try { result = Regex.IsMatch(fileInfo.Name, pattern, RegexOptions.Compiled); }
             catch { result = false; }
             return result;
         }
         private static bool MatchByPatternWithExtensionEx(FileInfo fileInfo, string pattern)
         {
-            bool result = false;
-            try
-            {
-                result = Regex.IsMatch(fileInfo.Name, pattern, RegexOptions.Compiled);
-            }
+            bool result; // = false;
+            try { result = Regex.IsMatch(fileInfo.Name, pattern, RegexOptions.Compiled); }
             catch { result = false; }
             return result;
         }
@@ -238,87 +163,55 @@ namespace System.IO.SafeTraversal.Core
         private bool MatchByExtension(FileInfo fileInfo, string extension)
         {
             extension = Regex.Match(extension, @"(\.)?\w+").Value;
-            if (!extension.StartsWith("."))
-                extension = "." + extension;
+            if (!extension.StartsWith(".")) extension = "." + extension;
             return fileInfo.Extension.Equals(extension, StringComparison.InvariantCultureIgnoreCase);
         }
         private static bool MatchByExtensionEx(FileInfo fileInfo, string extension)
         {
             extension = Regex.Match(extension, @"(\.)?\w+").Value;
-            if (!extension.StartsWith("."))
-                extension = "." + extension;
+            if (!extension.StartsWith(".")) extension = "." + extension;
             return fileInfo.Extension.Equals(extension, StringComparison.InvariantCultureIgnoreCase);
         }
 
-        private bool MatchByAttributes(FileInfo fileInfo, FileAttributes fileAttributes)
-        {
-            return fileInfo.Attributes == fileAttributes;
-        }
-        private static bool MatchByAttributesEx(FileInfo fileInfo, FileAttributes fileAttributes)
-        {
-            return fileInfo.Attributes == fileAttributes;
-        }
+        private bool MatchByAttributes(FileInfo fileInfo, FileAttributes fileAttributes) => fileInfo.Attributes == fileAttributes;
+        private static bool MatchByAttributesEx(FileInfo fileInfo, FileAttributes fileAttributes) => fileInfo.Attributes == fileAttributes;
 
-        private bool MatchByName(FileInfo fileInfo, string keyword, StringComparison stringComparison)
-        {
-            return Path.GetFileNameWithoutExtension(fileInfo.Name).Equals(keyword, stringComparison);
-        }
-        private static bool MatchByNameEx(FileInfo fileInfo, string keyword, StringComparison stringComparison)
-        {
-            return Path.GetFileNameWithoutExtension(fileInfo.Name).Equals(keyword, stringComparison);
-        }
+        private bool MatchByName(FileInfo fileInfo, string keyword, StringComparison stringComparison) =>
+            Path.GetFileNameWithoutExtension(fileInfo.Name).Equals(keyword, stringComparison);
+        private static bool MatchByNameEx(FileInfo fileInfo, string keyword, StringComparison stringComparison) =>
+            Path.GetFileNameWithoutExtension(fileInfo.Name).Equals(keyword, stringComparison);
 
-        private bool MatchByNameWithExtension(FileInfo fileInfo, string keyword, StringComparison stringComparison)
-        {
-            return fileInfo.Name.Equals(keyword, stringComparison);
-        }
-        private static bool MatchByNameWithExtensionEx(FileInfo fileInfo, string keyword, StringComparison stringComparison)
-        {
-            return fileInfo.Name.Equals(keyword, stringComparison);
-        }
+        private bool MatchByNameWithExtension(FileInfo fileInfo, string keyword, StringComparison stringComparison) =>
+            fileInfo.Name.Equals(keyword, stringComparison);
+        private static bool MatchByNameWithExtensionEx(FileInfo fileInfo, string keyword, StringComparison stringComparison) =>
+            fileInfo.Name.Equals(keyword, stringComparison);
 
         private bool MatchByCommonSize(FileInfo fileInfo, CommonSize commonSize)
         {
             switch (commonSize)
             {
-                case CommonSize.Empty:
-                    return fileInfo.Length == 0;
-                case CommonSize.Tiny:
-                    return MatchBySizeRange(fileInfo, 1, 10, SizeType.KiloBytes);
-                case CommonSize.Small:
-                    return MatchBySizeRange(fileInfo, 11, 100, SizeType.KiloBytes);
-                case CommonSize.Medium:
-                    return MatchBySizeRange(fileInfo, 101, 1000, SizeType.KiloBytes);
-                case CommonSize.Large:
-                    return MatchBySizeRange(fileInfo, 2, 16, SizeType.MegaBytes);
-                case CommonSize.Huge:
-                    return MatchBySizeRange(fileInfo, 17, 128, SizeType.MegaBytes);
-                default:
-                    return fileInfo.Length > SizeConverter(129, SizeType.MegaBytes, SizeConverterType.LowerBound);
+                case CommonSize.Empty: return fileInfo.Length == 0;
+                case CommonSize.Tiny: return MatchBySizeRange(fileInfo, 1, 10, SizeType.KiloBytes);
+                case CommonSize.Small: return MatchBySizeRange(fileInfo, 11, 100, SizeType.KiloBytes);
+                case CommonSize.Medium: return MatchBySizeRange(fileInfo, 101, 1000, SizeType.KiloBytes);
+                case CommonSize.Large: return MatchBySizeRange(fileInfo, 2, 16, SizeType.MegaBytes);
+                case CommonSize.Huge: return MatchBySizeRange(fileInfo, 17, 128, SizeType.MegaBytes);
+                default: return fileInfo.Length > SizeConverter(129, SizeType.MegaBytes, SizeConverterType.LowerBound);
             }
         }
         private static bool MatchByCommonSizeEx(FileInfo fileInfo, CommonSize commonSize)
         {
             switch (commonSize)
             {
-                case CommonSize.Empty:
-                    return fileInfo.Length == 0;
-                case CommonSize.Tiny:
-                    return MatchBySizeRangeEx(fileInfo, 1, 10, SizeType.KiloBytes);
-                case CommonSize.Small:
-                    return MatchBySizeRangeEx(fileInfo, 11, 100, SizeType.KiloBytes);
-                case CommonSize.Medium:
-                    return MatchBySizeRangeEx(fileInfo, 101, 1000, SizeType.KiloBytes);
-                case CommonSize.Large:
-                    return MatchBySizeRangeEx(fileInfo, 2, 16, SizeType.MegaBytes);
-                case CommonSize.Huge:
-                    return MatchBySizeRangeEx(fileInfo, 17, 128, SizeType.MegaBytes);
-                default:
-                    return fileInfo.Length > SizeConverterEx(129, SizeType.MegaBytes, SizeConverterType.LowerBound);
+                case CommonSize.Empty: return fileInfo.Length == 0;
+                case CommonSize.Tiny: return MatchBySizeRangeEx(fileInfo, 1, 10, SizeType.KiloBytes);
+                case CommonSize.Small: return MatchBySizeRangeEx(fileInfo, 11, 100, SizeType.KiloBytes);
+                case CommonSize.Medium: return MatchBySizeRangeEx(fileInfo, 101, 1000, SizeType.KiloBytes);
+                case CommonSize.Large: return MatchBySizeRangeEx(fileInfo, 2, 16, SizeType.MegaBytes);
+                case CommonSize.Huge: return MatchBySizeRangeEx(fileInfo, 17, 128, SizeType.MegaBytes);
+                default: return fileInfo.Length > SizeConverterEx(129, SizeType.MegaBytes, SizeConverterType.LowerBound);
             }
         }
-
-
         #endregion
 
         #region DIRECTORY
@@ -395,7 +288,6 @@ namespace System.IO.SafeTraversal.Core
             catch { result = false; }
             return result;
         }
-
         #endregion
 
         #region FILE OPTIONS

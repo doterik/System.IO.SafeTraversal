@@ -14,7 +14,6 @@ namespace System.IO.SafeTraversal.Core
         /// <returns>IEnumerable of DirectoryInfo representing all parents. Null if current path is a root.</returns>
         public static IEnumerable<DirectoryInfo> FindParents(this DirectoryInfo path)
         {
-
             if (!path.Exists)
                 throw new DirectoryNotFoundException();
             while (path.Parent != null)

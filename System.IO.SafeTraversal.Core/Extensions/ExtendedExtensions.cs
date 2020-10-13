@@ -114,7 +114,7 @@ namespace System.IO.SafeTraversal.Core
 
         private static IEnumerable<DirectoryInfo> ExTopLevelDirectoriesTraversal(DirectoryInfo path)
         {
-            DirectoryInfo[] dirs = null;
+            DirectoryInfo[] dirs; // = null;
             try
             {
                 dirs = path.GetDirectories();
@@ -166,7 +166,7 @@ namespace System.IO.SafeTraversal.Core
         }
         private static IEnumerable<string> ExTopLevelDirectoriesTraversal(string path)
         {
-            string[] dirs = null;
+            string[] dirs; // = null;
             try
             {
                 dirs = Directory.GetDirectories(path);
@@ -227,7 +227,7 @@ namespace System.IO.SafeTraversal.Core
             while (directories.Count > 0)
             {
                 DirectoryInfo currentDir = directories.Dequeue();
-                FileInfo[] files = null;
+                FileInfo[] files;
                 try
                 {
                     files = currentDir.GetFiles();
@@ -245,7 +245,7 @@ namespace System.IO.SafeTraversal.Core
                         yield return files[i];
                     }
                 }
-                DirectoryInfo[] dirs = null;
+                DirectoryInfo[] dirs;
                 try
                 {
                     dirs = currentDir.GetDirectories();
@@ -279,7 +279,7 @@ namespace System.IO.SafeTraversal.Core
                         .Where(x =>
                         {
                             //why? it prevents exception being thrown inside filter
-                            bool success = true;
+                            bool success; // = true;
                             try
                             {
                                 success = filter(x);
@@ -327,7 +327,7 @@ namespace System.IO.SafeTraversal.Core
             while (directories.Count > 0)
             {
                 string currentDir = directories.Dequeue();
-                string[] files = null;
+                string[] files;
                 try
                 {
                     files = Directory.GetFiles(currentDir);
@@ -335,7 +335,6 @@ namespace System.IO.SafeTraversal.Core
                 catch
                 {
                     files = null;
-
                 }
 
                 if (files != null)
@@ -345,7 +344,7 @@ namespace System.IO.SafeTraversal.Core
                         yield return files[i];
                     }
                 }
-                string[] dirs = null;
+                string[] dirs;
                 try
                 {
                     dirs = Directory.GetDirectories(currentDir);
@@ -353,7 +352,6 @@ namespace System.IO.SafeTraversal.Core
                 catch
                 {
                     dirs = null;
-
                 }
 
                 if (dirs != null)
@@ -380,7 +378,7 @@ namespace System.IO.SafeTraversal.Core
                         .Where(x =>
                         {
                             //why? it prevents exception being thrown inside filter
-                            bool success = true;
+                            bool success; // = true;
                             try
                             {
                                 success = filter(x);
@@ -431,7 +429,7 @@ namespace System.IO.SafeTraversal.Core
             while (directories.Count > 0)
             {
                 DirectoryInfo currentDir = directories.Dequeue();
-                DirectoryInfo[] dirs = null;
+                DirectoryInfo[] dirs;
                 try
                 {
                     dirs = currentDir.GetDirectories();
@@ -459,7 +457,7 @@ namespace System.IO.SafeTraversal.Core
             while (directories.Count > 0)
             {
                 DirectoryInfo currentDir = directories.Dequeue();
-                DirectoryInfo[] dirs = null;
+                DirectoryInfo[] dirs;
                 try
                 {
                     dirs = currentDir.GetDirectories();
@@ -472,7 +470,7 @@ namespace System.IO.SafeTraversal.Core
                 {
                     for (int i = 0; i < dirs.Length; i++)
                     {
-                        bool found = true;
+                        bool found;
                         try
                         {
                             found = filter(dirs[i]); //to prevent malicious injection
@@ -493,7 +491,7 @@ namespace System.IO.SafeTraversal.Core
             while (directories.Count > 0)
             {
                 DirectoryInfo currentDir = directories.Dequeue();
-                DirectoryInfo[] dirs = null;
+                DirectoryInfo[] dirs;
                 try
                 {
                     dirs = currentDir.GetDirectories();
@@ -521,7 +519,7 @@ namespace System.IO.SafeTraversal.Core
             while (directories.Count > 0)
             {
                 DirectoryInfo currentDir = directories.Dequeue();
-                DirectoryInfo[] dirs = null;
+                DirectoryInfo[] dirs;
                 try
                 {
                     dirs = currentDir.GetDirectories();
@@ -534,7 +532,7 @@ namespace System.IO.SafeTraversal.Core
                 {
                     for (int i = 0; i < dirs.Length; i++)
                     {
-                        bool found = true;
+                        bool found;
                         try
                         {
                             found = filter(dirs[i]); //to prevent malicious injection
@@ -548,7 +546,6 @@ namespace System.IO.SafeTraversal.Core
                 }
             }
         }
-
         #endregion
     }
 }

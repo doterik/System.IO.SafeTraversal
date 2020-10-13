@@ -131,7 +131,6 @@ namespace System.IO.SafeTraversal.Core
             }
         }
 
-
         private IEnumerable<DirectoryInfo> TopLevelDirectoriesTraversal(DirectoryInfo path)
         {
             DirectoryInfo[] dirs = null;

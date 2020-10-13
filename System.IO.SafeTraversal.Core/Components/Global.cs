@@ -58,23 +58,23 @@
         /// </summary>
         Empty = 1,
         /// <summary>
-        /// 0 - 10 KB
+        /// 0..10 KB
         /// </summary>
         Tiny = 2,
         /// <summary>
-        /// 10-100 KB
+        /// 10..100 KB
         /// </summary>
         Small = 3,
         /// <summary>
-        /// 100 KB - 1 MB
+        /// 100 KB .. 1MB
         /// </summary>
         Medium = 4,
         /// <summary>
-        /// 1 - 16 MB
+        /// 1..16 MB
         /// </summary>
         Large = 5,
         /// <summary>
-        /// 16 - 128 MB
+        /// 16..128 MB
         /// </summary>
         Huge = 6,
         /// <summary>
@@ -323,5 +323,4 @@
         public DateComparisonType DateComparisonType { get; private set; }
 
     }
-
 }
