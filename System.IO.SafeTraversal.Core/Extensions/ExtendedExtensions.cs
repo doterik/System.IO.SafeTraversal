@@ -5,376 +5,159 @@ namespace System.IO.SafeTraversal.Core
 	public partial class SafeTraversal
 	{
 		#region Top Level Traversals
-		private static IEnumerable<FileInfo> ExTopLevelFilesTraversal(DirectoryInfo path)
+		private static IEnumerable<FileInfo> ExTopLevelFilesTraversal(DirectoryInfo path, Func<FileInfo, bool>? filter = null)
 		{
-			FileInfo[]? files;
+			FileInfo[]? files; // IEnumerable<FileInfo>? files = null;
 			try
 			{
-				files = path.GetFiles();
-			}
-			catch { files = null; }
-
-			if (files != null)
-			{
-				for (int i = 0; i < files.Length; i++)
-				{
-					yield return files[i];
-				}
-			}
-		}
-		private static IEnumerable<FileInfo> ExTopLevelFilesTraversal(DirectoryInfo path, Func<FileInfo, bool> filter)
-		{
-			IEnumerable<FileInfo>? files = null;
-			try
-			{
-				files = path.GetFiles().Where(x =>
-				{
-					var success = true; // Why? It prevents exception being thrown inside filter.
-					try
-					{
-						success = filter(x);
-					}
-					catch { success = false; }
-					return success;
-				});
-			}
-			catch { files = null; }
-
-			if (files != null)
-			{
-				foreach (FileInfo file in files)
-				{
-					yield return file;
-				}
-			}
-		}
-
-
-		private static IEnumerable<string> ExTopLevelFilesTraversal(string path)
-		{
-			string[]? files;
-			try
-			{
-				files = Directory.GetFiles(path);
-			}
-			catch { files = null; }
-
-			if (files != null)
-			{
-				for (int i = 0; i < files.Length; i++)
-				{
-					yield return files[i];
-				}
-			}
-		}
-		private static IEnumerable<string> ExTopLevelFilesTraversal(string path, Func<FileInfo, bool> filter)
-		{
-			IEnumerable<string>? files = null;
-			try
-			{
-				files = new DirectoryInfo(path)
-					.GetFiles()
-					.Where(x =>
+				files = filter is null
+					? path.GetFiles()
+					: path.GetFiles().Where(x =>
 					{
 						var success = true; // Why? It prevents exception being thrown inside filter.
-						try
-						{
-							success = filter(x);
-						}
+						try { success = filter(x); }
 						catch { success = false; }
 						return success;
 					})
-					.Select(x => x.FullName);
+					.ToArray();
 			}
 			catch { files = null; }
 
-			if (files != null)
-			{
-				foreach (string file in files)
-				{
-					yield return file;
-				}
-			}
+			for (var i = 0; i < files?.Length; i++) yield return files[i];
 		}
 
-		private static IEnumerable<DirectoryInfo> ExTopLevelDirectoriesTraversal(DirectoryInfo path)
+		private static IEnumerable<string> ExTopLevelFilesTraversal(string path, Func<FileInfo, bool>? filter = null)
 		{
-			DirectoryInfo[]? dirs; // = null;
+			string[]? files; // IEnumerable<string>? files = null;
 			try
 			{
-				dirs = path.GetDirectories();
-			}
-			catch { dirs = null; }
-
-			if (dirs != null)
-			{
-				for (int i = 0; i < dirs.Length; i++)
-				{
-					yield return dirs[i];
-				}
-			}
-		}
-		private static IEnumerable<DirectoryInfo> ExTopLevelDirectoriesTraversal(DirectoryInfo path, Func<DirectoryInfo, bool> filter)
-		{
-			IEnumerable<DirectoryInfo>? dirs = null;
-			try
-			{
-				dirs = path
-					.GetDirectories()
-					.Where(x =>
+				files = filter is null
+					? Directory.GetFiles(path)
+					: new DirectoryInfo(path).GetFiles().Where(x =>
 					{
 						var success = true; // Why? It prevents exception being thrown inside filter.
-						try
-						{
-							success = filter(x);
-						}
-						catch { success = false; }
-						return success;
-					});
-			}
-			catch
-			{
-				dirs = null;
-
-			}
-			if (dirs != null)
-			{
-				foreach (DirectoryInfo dir in dirs)
-				{
-					yield return dir;
-				}
-			}
-		}
-		private static IEnumerable<string> ExTopLevelDirectoriesTraversal(string path)
-		{
-			string[]? dirs; // = null;
-			try
-			{
-				dirs = Directory.GetDirectories(path);
-			}
-			catch { dirs = null; }
-
-			if (dirs != null)
-			{
-				for (int i = 0; i < dirs.Length; i++)
-				{
-					yield return dirs[i];
-				}
-			}
-		}
-		private static IEnumerable<string> ExTopLevelDirectoriesTraversal(string path, Func<DirectoryInfo, bool> filter)
-		{
-			IEnumerable<string>? dirs = null;
-			try
-			{
-				dirs = new DirectoryInfo(path)
-					.GetDirectories(path)
-					.Where(x =>
-					{
-						var success = true; // Why? It prevents exception being thrown inside filter.
-						try
-						{
-							success = filter(x);
-						}
+						try { success = filter(x); }
 						catch { success = false; }
 						return success;
 					})
-					.Select(x => x.FullName);
+					.Select(x => x.FullName).ToArray();
+			}
+			catch { files = null; }
+
+			for (var i = 0; i < files?.Length; i++) yield return files[i];
+		}
+
+		private static IEnumerable<DirectoryInfo> ExTopLevelDirectoriesTraversal(DirectoryInfo path, Func<DirectoryInfo, bool>? filter = null)
+		{
+			DirectoryInfo[]? dirs; // IEnumerable<DirectoryInfo>? dirs = null;
+			try
+			{
+				dirs = filter is null
+					? path.GetDirectories()
+					: path.GetDirectories().Where(x =>
+					{
+						var success = true; // Why? It prevents exception being thrown inside filter.
+						try { success = filter(x); }
+						catch { success = false; }
+						return success;
+					})
+					.ToArray();
 			}
 			catch { dirs = null; }
 
-			if (dirs != null)
+			for (var i = 0; i < dirs?.Length; i++) yield return dirs[i];
+		}
+
+		private static IEnumerable<string> ExTopLevelDirectoriesTraversal(string path, Func<DirectoryInfo, bool>? filter = null)
+		{
+			string[]? dirs; // IEnumerable<string>? dirs = null;
+			try
 			{
-				foreach (string dir in dirs)
-				{
-					yield return dir;
-				}
+				dirs = filter is null
+					? Directory.GetDirectories(path)
+					: new DirectoryInfo(path).GetDirectories(path).Where(x =>
+					{
+						var success = true; // Why? It prevents exception being thrown inside filter.
+						try { success = filter(x); }
+						catch { success = false; }
+						return success;
+					})
+					.Select(x => x.FullName).ToArray();
 			}
+			catch { dirs = null; }
+
+			for (var i = 0; i < dirs?.Length; i++) yield return dirs[i];
 		}
 		#endregion
 
 		#region All Directories Level Traversals
-		private static IEnumerable<FileInfo> ExTraverseFilesCore(DirectoryInfo path)
+		private static IEnumerable<FileInfo> ExTraverseFilesCore(DirectoryInfo path, Func<FileInfo, bool>? filter = null)
 		{
 			var directories = new Queue<DirectoryInfo>();
 			directories.Enqueue(path);
 			while (directories.Count > 0)
 			{
 				DirectoryInfo currentDir = directories.Dequeue();
-				FileInfo[]? files;
+				FileInfo[]? files; // IEnumerable<FileInfo>? files = null;
 				try
 				{
-					files = currentDir.GetFiles();
-				}
-				catch { files = null; }
-
-				if (files != null)
-				{
-					for (int i = 0; i < files.Length; i++)
-					{
-						yield return files[i];
-					}
-				}
-				DirectoryInfo[]? dirs;
-				try
-				{
-					dirs = currentDir.GetDirectories();
-				}
-				catch { dirs = null; }
-
-				if (dirs != null)
-				{
-					for (int i = 0; i < dirs.Length; i++)
-					{
-						directories.Enqueue(dirs[i]);
-					}
-				}
-			}
-		}
-		private static IEnumerable<FileInfo> ExTraverseFilesCore(DirectoryInfo path, Func<FileInfo, bool> filter)
-		{
-			var directories = new Queue<DirectoryInfo>();
-			directories.Enqueue(path);
-			while (directories.Count > 0)
-			{
-				DirectoryInfo currentDir = directories.Dequeue();
-				IEnumerable<FileInfo>? files = null;
-				try
-				{
-					files = currentDir
-						.GetFiles()
-						.Where(x =>
+					files = filter is null
+						? currentDir.GetFiles()
+						: currentDir.GetFiles().Where(x =>
 						{
-							bool success; // Why? It prevents exception being thrown inside filter.
-							try
-							{
-								success = filter(x);
-							}
-							catch { success = false; }
-							return success;
-						});
-				}
-				catch { files = null; }
-
-				if (files != null)
-				{
-					foreach (FileInfo file in files)
-					{
-						yield return file;
-					}
-				}
-
-				DirectoryInfo[]? dirs = null;
-				try
-				{
-					dirs = currentDir.GetDirectories();
-				}
-				catch { dirs = null; }
-
-				if (dirs != null)
-				{
-					for (int i = 0; i < dirs.Length; i++)
-					{
-						directories.Enqueue(dirs[i]);
-					}
-				}
-			}
-		}
-
-		private static IEnumerable<string> ExTraverseFilesCore(string path)
-		{
-			var directories = new Queue<string>();
-			directories.Enqueue(path);
-			while (directories.Count > 0)
-			{
-				string currentDir = directories.Dequeue();
-				string[]? files;
-				try
-				{
-					files = Directory.GetFiles(currentDir);
-				}
-				catch { files = null; }
-
-				if (files != null)
-				{
-					for (int i = 0; i < files.Length; i++)
-					{
-						yield return files[i];
-					}
-				}
-
-				string[]? dirs;
-				try
-				{
-					dirs = Directory.GetDirectories(currentDir);
-				}
-				catch { dirs = null; }
-
-				if (dirs != null)
-				{
-					for (int i = 0; i < dirs.Length; i++)
-					{
-						directories.Enqueue(dirs[i]);
-					}
-				}
-			}
-		}
-		private static IEnumerable<string> ExTraverseFilesCore(string path, Func<FileInfo, bool> filter)
-		{
-			var directories = new Queue<string>();
-			directories.Enqueue(path);
-			while (directories.Count > 0)
-			{
-				string currentDir = directories.Dequeue();
-				IEnumerable<string>? files = null;
-				try
-				{
-					files = new DirectoryInfo(currentDir)
-						.GetFiles()
-						.Where(x =>
-						{
-							//why? it prevents exception being thrown inside filter
-							bool success; // = true;
-							try
-							{
-								success = filter(x);
-							}
+							var success = true; // Why? It prevents exception being thrown inside filter.
+							try { success = filter(x); }
 							catch { success = false; }
 							return success;
 						})
-						.Select(x => x.FullName);
+						.ToArray();
 				}
-				catch
-				{
-					files = null;
+				catch { files = null; }
 
-				}
+				for (var i = 0; i < files?.Length; i++) yield return files[i];
 
-				if (files != null)
-				{
-					foreach (string file in files)
-					{
-						yield return file;
-					}
-				}
-				string[]? dirs = null;
-				try
-				{
-					dirs = Directory.GetDirectories(currentDir);
-				}
+				DirectoryInfo[]? dirs = null;
+				try { dirs = currentDir.GetDirectories(); }
 				catch { dirs = null; }
 
-				if (dirs != null)
-				{
-					for (int i = 0; i < dirs.Length; i++)
-					{
-						directories.Enqueue(dirs[i]);
-					}
-				}
+				for (var i = 0; i < dirs?.Length; i++) directories.Enqueue(dirs[i]);
 			}
 		}
 
-		private static IEnumerable<DirectoryInfo> ExTraverseDirectoriesCore(DirectoryInfo path)
+		private static IEnumerable<string> ExTraverseFilesCore(string path, Func<FileInfo, bool>? filter = null)
+		{
+			var directories = new Queue<string>();
+			directories.Enqueue(path);
+			while (directories.Count > 0)
+			{
+				string currentDir = directories.Dequeue();
+				string[]? files; // IEnumerable<string>? files = null;
+				try
+				{
+					files = filter is null
+						? Directory.GetFiles(currentDir)
+						: new DirectoryInfo(currentDir).GetFiles().Where(x =>
+						{
+							var success = true; // Why? It prevents exception being thrown inside filter.
+							try { success = filter(x); }
+							catch { success = false; }
+							return success;
+						})
+						.Select(x => x.FullName).ToArray();
+				}
+				catch { files = null; }
+
+				for (var i = 0; i < files?.Length; i++) yield return files[i];
+
+				string[]? dirs = null;
+				try { dirs = Directory.GetDirectories(currentDir); }
+				catch { dirs = null; }
+
+				for (var i = 0; i < dirs?.Length; i++) directories.Enqueue(dirs[i]);
+			}
+		}
+
+		private static IEnumerable<DirectoryInfo> ExTraverseDirectoriesCore(DirectoryInfo path, Func<DirectoryInfo, bool>? filter = null)
 		{
 			var directories = new Queue<DirectoryInfo>();
 			directories.Enqueue(path);
@@ -382,55 +165,33 @@ namespace System.IO.SafeTraversal.Core
 			{
 				DirectoryInfo currentDir = directories.Dequeue();
 				DirectoryInfo[]? dirs;
-				try
-				{
-					dirs = currentDir.GetDirectories();
-				}
+				try { dirs = currentDir.GetDirectories(); }
 				catch { dirs = null; }
 
-				if (dirs != null)
+				if (filter is null)
 				{
-					for (int i = 0; i < dirs.Length; i++)
+					for (var i = 0; i < dirs?.Length; i++)
 					{
-						directories.Enqueue(dirs[i]);
+						directories.Enqueue(dirs[i]); // TODO Check order.
 						yield return dirs[i];
 					}
 				}
-			}
-		}
-		private static IEnumerable<DirectoryInfo> ExTraverseDirectoriesCore(DirectoryInfo path, Func<DirectoryInfo, bool> filter)
-		{
-			var directories = new Queue<DirectoryInfo>();
-			directories.Enqueue(path);
-			while (directories.Count > 0)
-			{
-				DirectoryInfo currentDir = directories.Dequeue();
-				DirectoryInfo[]? dirs;
-				try
+				else
 				{
-					dirs = currentDir.GetDirectories();
-				}
-				catch { dirs = null; }
-
-				if (dirs != null)
-				{
-					for (int i = 0; i < dirs.Length; i++)
+					for (var i = 0; i < dirs?.Length; i++)
 					{
 						bool found;
-						try
-						{
-							found = filter(dirs[i]); // To prevent malicious injection.
-						}
+						try { found = filter(dirs[i]); } // To prevent malicious injection.
 						catch { found = false; }
 
-						if (found) yield return dirs[i];
-
+						if (found) yield return dirs[i]; // TODO Check order.
 						directories.Enqueue(dirs[i]);
 					}
 				}
 			}
 		}
-		private static IEnumerable<string> ExTraverseDirectoriesCore(string path)
+
+		private static IEnumerable<string> ExTraverseDirectoriesCore(string path, Func<DirectoryInfo, bool>? filter = null)
 		{
 			var directories = new Queue<DirectoryInfo>();
 			directories.Enqueue(new DirectoryInfo(path));
@@ -438,51 +199,29 @@ namespace System.IO.SafeTraversal.Core
 			{
 				DirectoryInfo currentDir = directories.Dequeue();
 				DirectoryInfo[]? dirs;
-				try
-				{
-					dirs = currentDir.GetDirectories();
-				}
+				try { dirs = currentDir.GetDirectories(); }
 				catch { dirs = null; }
 
-				if (dirs != null)
+				if (filter is null)
 				{
-					for (int i = 0; i < dirs.Length; i++)
+					for (var i = 0; i < dirs?.Length; i++)
 					{
-						directories.Enqueue(dirs[i]);
+						directories.Enqueue(dirs[i]); // TODO Check order.
 						yield return dirs[i].FullName;
 					}
 				}
-			}
-		}
-		private static IEnumerable<string> ExTraverseDirectoriesCore(string path, Func<DirectoryInfo, bool> filter)
-		{
-			var directories = new Queue<DirectoryInfo>();
-			directories.Enqueue(new DirectoryInfo(path));
-			while (directories.Count > 0)
-			{
-				DirectoryInfo currentDir = directories.Dequeue();
-				DirectoryInfo[]? dirs;
-				try
+				else
 				{
-					dirs = currentDir.GetDirectories();
-				}
-				catch { dirs = null; }
-
-				if (dirs != null)
-				{
-					for (int i = 0; i < dirs.Length; i++)
+					for (var i = 0; i < dirs?.Length; i++)
 					{
 						bool found;
-						try
-						{
-							found = filter(dirs[i]); // To prevent malicious injection.
-						}
+						try { found = filter(dirs[i]); } // To prevent malicious injection.
 						catch { found = false; }
 
-						if (found) yield return dirs[i].FullName;
-
+						if (found) yield return dirs[i].FullName; // TODO Check order.
 						directories.Enqueue(dirs[i]);
 					}
+
 				}
 			}
 		}
