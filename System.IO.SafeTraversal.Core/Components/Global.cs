@@ -132,7 +132,7 @@
 		/// <summary>
 		/// Gets size in double.
 		/// </summary>
-		public double Size { get; private set; } = 0;
+		public double Size { get; private set; }
 		/// <summary>
 		/// Gets size type that specifies unit.
 		/// </summary>
@@ -159,11 +159,11 @@
 		/// <summary>
 		/// Gets lower bound size in double.
 		/// </summary>
-		public double LowerBoundSize { get; private set; } = 0;
+		public double LowerBoundSize { get; private set; }
 		/// <summary>
 		/// Gets upper bound size in double.
 		/// </summary>
-		public double UpperBoundSize { get; private set; } = 0;
+		public double UpperBoundSize { get; private set; }
 		/// <summary>
 		/// Gets size type that specifies unit.
 		/// </summary>
@@ -287,10 +287,7 @@
 		/// Default constructor.
 		/// </summary>
 		/// <param name="pattern">Valid .NET regular expression pattern.</param>
-		public SearchDirectoryByRegularExpressionOption(string pattern)
-		{
-			Pattern = pattern;
-		}
+		public SearchDirectoryByRegularExpressionOption(string pattern) => Pattern = pattern;
 		/// <summary>
 		/// Gets regular expression pattern.
 		/// </summary>

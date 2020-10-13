@@ -221,7 +221,6 @@ namespace System.IO.SafeTraversal.Core
 						if (found) yield return dirs[i].FullName; // TODO Check order.
 						directories.Enqueue(dirs[i]);
 					}
-
 				}
 			}
 		}

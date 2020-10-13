@@ -17,8 +17,8 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\netcoreapp2.0\System.IO.SafeTraversal.Core.xml</DocumentationFile>
     <PlatformTarget>x64</PlatformTarget>
+    <DocumentationFile>bin\Release\netcoreapp2.1\System.IO.SafeTraversal.Core.xml</DocumentationFile>
   </PropertyGroup>
 
 </Project>
