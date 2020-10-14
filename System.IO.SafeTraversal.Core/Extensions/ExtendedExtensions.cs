@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+
 namespace System.IO.SafeTraversal.Core
 {
 	public partial class SafeTraversal
 	{
 		#region Top Level Traversals
-		private static IEnumerable<FileInfo> ExTopLevelFilesTraversal(DirectoryInfo path, Func<FileInfo, bool>? filter = null)
+		private static IEnumerable<FileInfo> ExTopLevelFilesTraversal(DirectoryInfo path, Func<FileInfo, bool>? filter = null, Action<TraversalError>? onLogError = null)
 		{
 			FileInfo[]? files; // IEnumerable<FileInfo>? files = null;
 			try
@@ -14,12 +15,21 @@ namespace System.IO.SafeTraversal.Core
 					? path.GetFiles()
 					: path.GetFiles().Where(x => x.Pass(filter)).ToArray();
 			}
-			catch { files = null; }
+			catch (UnauthorizedAccessException ex)
+			{
+				files = null;
+				if (onLogError is not null) onLogError(new TraversalError(ex.Message));
+			}
+			catch (Exception ex)
+			{
+				files = null;
+				if (onLogError is not null) onLogError(new TraversalError(ex.Message));
+			}
 
 			for (var i = 0; i < files?.Length; i++) yield return files[i];
 		}
 
-		private static IEnumerable<string> ExTopLevelFilesTraversal(string path, Func<FileInfo, bool>? filter = null)
+		private static IEnumerable<string> ExTopLevelFilesTraversal(string path, Func<FileInfo, bool>? filter = null, Action<TraversalError>? onLogError = null)
 		{
 			string[]? files; // IEnumerable<string>? files = null;
 			try
@@ -28,12 +38,21 @@ namespace System.IO.SafeTraversal.Core
 					? Directory.GetFiles(path)
 					: new DirectoryInfo(path).GetFiles().Where(x => x.Pass(filter)).Select(x => x.FullName).ToArray();
 			}
-			catch { files = null; }
+			catch (UnauthorizedAccessException ex)
+			{
+				files = null;
+				if (onLogError is not null) onLogError(new TraversalError(ex.Message));
+			}
+			catch (Exception ex)
+			{
+				files = null;
+				if (onLogError is not null) onLogError(new TraversalError(ex.Message));
+			}
 
 			for (var i = 0; i < files?.Length; i++) yield return files[i];
 		}
 
-		private static IEnumerable<DirectoryInfo> ExTopLevelDirectoriesTraversal(DirectoryInfo path, Func<DirectoryInfo, bool>? filter = null)
+		private static IEnumerable<DirectoryInfo> ExTopLevelDirectoriesTraversal(DirectoryInfo path, Func<DirectoryInfo, bool>? filter = null, Action<TraversalError>? onLogError = null)
 		{
 			DirectoryInfo[]? dirs; // IEnumerable<DirectoryInfo>? dirs = null;
 			try
@@ -42,12 +61,21 @@ namespace System.IO.SafeTraversal.Core
 					? path.GetDirectories()
 					: path.GetDirectories().Where(x => x.Pass(filter)).ToArray();
 			}
-			catch { dirs = null; }
+			catch (UnauthorizedAccessException ex)
+			{
+				dirs = null;
+				if (onLogError is not null) onLogError(new TraversalError(ex.Message));
+			}
+			catch (Exception ex)
+			{
+				dirs = null;
+				if (onLogError is not null) onLogError(new TraversalError(ex.Message));
+			}
 
 			for (var i = 0; i < dirs?.Length; i++) yield return dirs[i];
 		}
 
-		private static IEnumerable<string> ExTopLevelDirectoriesTraversal(string path, Func<DirectoryInfo, bool>? filter = null)
+		private static IEnumerable<string> ExTopLevelDirectoriesTraversal(string path, Func<DirectoryInfo, bool>? filter = null, Action<TraversalError>? onLogError = null)
 		{
 			string[]? dirs; // IEnumerable<string>? dirs = null;
 			try
@@ -56,14 +84,23 @@ namespace System.IO.SafeTraversal.Core
 					? Directory.GetDirectories(path)
 					: new DirectoryInfo(path).GetDirectories(path).Where(x => x.Pass(filter)).Select(x => x.FullName).ToArray();
 			}
-			catch { dirs = null; }
+			catch (UnauthorizedAccessException ex)
+			{
+				dirs = null;
+				if (onLogError is not null) onLogError(new TraversalError(ex.Message));
+			}
+			catch (Exception ex)
+			{
+				dirs = null;
+				if (onLogError is not null) onLogError(new TraversalError(ex.Message));
+			}
 
 			for (var i = 0; i < dirs?.Length; i++) yield return dirs[i];
 		}
 		#endregion
 
 		#region All Directories Level Traversals
-		private static IEnumerable<FileInfo> ExTraverseFilesCore(DirectoryInfo path, Func<FileInfo, bool>? filter = null)
+		private static IEnumerable<FileInfo> ExTraverseFilesCore(DirectoryInfo path, Func<FileInfo, bool>? filter = null, Action<TraversalError>? onLogError = null)
 		{
 			var directories = new Queue<DirectoryInfo>();
 			directories.Enqueue(path);
@@ -77,19 +114,40 @@ namespace System.IO.SafeTraversal.Core
 						? currentDir.GetFiles()
 						: currentDir.GetFiles().Where(x => x.Pass(filter)).ToArray();
 				}
-				catch { files = null; }
+				catch (UnauthorizedAccessException ex)
+				{
+					files = null;
+					if (onLogError is not null) onLogError(new TraversalError(ex.Message));
+				}
+				catch (Exception ex)
+				{
+					files = null;
+					if (onLogError is not null) onLogError(new TraversalError(ex.Message));
+				}
 
 				for (var i = 0; i < files?.Length; i++) yield return files[i];
 
 				DirectoryInfo[]? dirs = null;
-				try { dirs = currentDir.GetDirectories(); }
-				catch { dirs = null; }
+				try
+				{
+					dirs = currentDir.GetDirectories();
+				}
+				catch (UnauthorizedAccessException ex)
+				{
+					dirs = null;
+					if (onLogError is not null) onLogError(new TraversalError(ex.Message));
+				}
+				catch (Exception ex)
+				{
+					dirs = null;
+					if (onLogError is not null) onLogError(new TraversalError(ex.Message));
+				}
 
 				for (var i = 0; i < dirs?.Length; i++) directories.Enqueue(dirs[i]);
 			}
 		}
 
-		private static IEnumerable<string> ExTraverseFilesCore(string path, Func<FileInfo, bool>? filter = null)
+		private static IEnumerable<string> ExTraverseFilesCore(string path, Func<FileInfo, bool>? filter = null, Action<TraversalError>? onLogError = null)
 		{
 			var directories = new Queue<string>();
 			directories.Enqueue(path);
@@ -103,19 +161,40 @@ namespace System.IO.SafeTraversal.Core
 						? Directory.GetFiles(currentDir)
 						: new DirectoryInfo(currentDir).GetFiles().Where(x => x.Pass(filter)).Select(x => x.FullName).ToArray();
 				}
-				catch { files = null; }
+				catch (UnauthorizedAccessException ex)
+				{
+					files = null;
+					if (onLogError is not null) onLogError(new TraversalError(ex.Message));
+				}
+				catch (Exception ex)
+				{
+					files = null;
+					if (onLogError is not null) onLogError(new TraversalError(ex.Message));
+				}
 
 				for (var i = 0; i < files?.Length; i++) yield return files[i];
 
 				string[]? dirs = null;
-				try { dirs = Directory.GetDirectories(currentDir); }
-				catch { dirs = null; }
+				try
+				{
+					dirs = Directory.GetDirectories(currentDir);
+				}
+				catch (UnauthorizedAccessException ex)
+				{
+					dirs = null;
+					if (onLogError is not null) onLogError(new TraversalError(ex.Message));
+				}
+				catch (Exception ex)
+				{
+					dirs = null;
+					if (onLogError is not null) onLogError(new TraversalError(ex.Message));
+				}
 
 				for (var i = 0; i < dirs?.Length; i++) directories.Enqueue(dirs[i]);
 			}
 		}
 
-		private static IEnumerable<DirectoryInfo> ExTraverseDirectoriesCore(DirectoryInfo path, Func<DirectoryInfo, bool>? filter = null)
+		private static IEnumerable<DirectoryInfo> ExTraverseDirectoriesCore(DirectoryInfo path, Func<DirectoryInfo, bool>? filter = null, Action<TraversalError>? onLogError = null)
 		{
 			var directories = new Queue<DirectoryInfo>();
 			directories.Enqueue(path);
@@ -123,8 +202,20 @@ namespace System.IO.SafeTraversal.Core
 			{
 				DirectoryInfo currentDir = directories.Dequeue();
 				DirectoryInfo[]? dirs;
-				try { dirs = currentDir.GetDirectories(); }
-				catch { dirs = null; }
+				try
+				{
+					dirs = currentDir.GetDirectories();
+				}
+				catch (UnauthorizedAccessException ex)
+				{
+					dirs = null;
+					if (onLogError is not null) onLogError(new TraversalError(ex.Message));
+				}
+				catch (Exception ex)
+				{
+					dirs = null;
+					if (onLogError is not null) onLogError(new TraversalError(ex.Message));
+				}
 
 				if (filter is null)
 				{
@@ -138,7 +229,7 @@ namespace System.IO.SafeTraversal.Core
 				{
 					for (var i = 0; i < dirs?.Length; i++)
 					{
-						bool found;
+						bool found = true; // TODO: true?
 						try { found = filter(dirs[i]); } // To prevent malicious injection.
 						catch { found = false; }
 
@@ -149,7 +240,7 @@ namespace System.IO.SafeTraversal.Core
 			}
 		}
 
-		private static IEnumerable<string> ExTraverseDirectoriesCore(string path, Func<DirectoryInfo, bool>? filter = null)
+		private static IEnumerable<string> ExTraverseDirectoriesCore(string path, Func<DirectoryInfo, bool>? filter = null, Action<TraversalError>? onLogError = null)
 		{
 			var directories = new Queue<DirectoryInfo>();
 			directories.Enqueue(new DirectoryInfo(path));
@@ -157,8 +248,20 @@ namespace System.IO.SafeTraversal.Core
 			{
 				DirectoryInfo currentDir = directories.Dequeue();
 				DirectoryInfo[]? dirs;
-				try { dirs = currentDir.GetDirectories(); }
-				catch { dirs = null; }
+				try
+				{
+					dirs = currentDir.GetDirectories();
+				}
+				catch (UnauthorizedAccessException ex)
+				{
+					dirs = null;
+					if (onLogError is not null) onLogError(new TraversalError(ex.Message));
+				}
+				catch (Exception ex)
+				{
+					dirs = null;
+					if (onLogError is not null) onLogError(new TraversalError(ex.Message));
+				}
 
 				if (filter is null)
 				{
@@ -172,7 +275,7 @@ namespace System.IO.SafeTraversal.Core
 				{
 					for (var i = 0; i < dirs?.Length; i++)
 					{
-						bool found;
+						bool found = true; // TODO: true ?
 						try { found = filter(dirs[i]); } // To prevent malicious injection.
 						catch { found = false; }
 

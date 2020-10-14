@@ -41,7 +41,7 @@ namespace System.IO.SafeTraversal.Core
 			if (path == null) throw new ArgumentNullException(nameof(path), "`path` cannot be null");
 			if (!path.Exists) throw new DirectoryNotFoundException($"{path.FullName} doesn't exist");
 
-			return searchOption == SearchOption.TopDirectoryOnly ? TopLevelFilesTraversal(path) : TraverseFilesCore(path);
+			return searchOption == SearchOption.TopDirectoryOnly ? /*TopLevelFilesTraversal(path)*/ExTopLevelFilesTraversal(path, onLogError: OnLogError) : /*TraverseFilesCore(path)*/ExTraverseFilesCore(path, onLogError: OnLogError); ;
 		}
 
 		/// <summary>
@@ -60,7 +60,7 @@ namespace System.IO.SafeTraversal.Core
 			if (!path.Exists) throw new DirectoryNotFoundException($"{path.FullName} doesn't exist");
 			if (filter == null) throw new ArgumentNullException(nameof(filter), "`filter` cannot be null");
 
-			return searchOption == SearchOption.TopDirectoryOnly ? TopLevelFilesTraversal(path, filter) : TraverseFilesCore(path, filter);
+			return searchOption == SearchOption.TopDirectoryOnly ? /*TopLevelFilesTraversal(path, filter)*/ExTopLevelFilesTraversal(path, filter, OnLogError) : /*TraverseFilesCore(path, filter)*/ExTraverseFilesCore(path, filter, OnLogError);
 		}
 
 		/// <summary>
@@ -225,7 +225,7 @@ namespace System.IO.SafeTraversal.Core
 			if (path == null) throw new ArgumentNullException(nameof(path), "`path` cannot be null");
 			if (!path.Exists) throw new DirectoryNotFoundException($"{path.FullName} doesn't exist");
 
-			return searchOption == SearchOption.TopDirectoryOnly ? TopLevelDirectoriesTraversal(path) : TraverseDirectoriesCore(path);
+			return searchOption == SearchOption.TopDirectoryOnly ? /*TopLevelDirectoriesTraversal(path)*/ExTopLevelDirectoriesTraversal(path, onLogError: OnLogError) : /*TraverseDirectoriesCore(path)*/ExTraverseDirectoriesCore(path, onLogError: OnLogError);
 		}
 
 		/// <summary>
@@ -244,7 +244,7 @@ namespace System.IO.SafeTraversal.Core
 			if (!path.Exists) throw new DirectoryNotFoundException($"{path.FullName} doesn't exist");
 			if (filter == null) throw new ArgumentNullException(nameof(filter), "`filter` cannot be null");
 
-			return searchOption == SearchOption.TopDirectoryOnly ? TopLevelDirectoriesTraversal(path, filter) : TraverseDirectoriesCore(path, filter);
+			return searchOption == SearchOption.TopDirectoryOnly ? /*TopLevelDirectoriesTraversal(path, filter)*/ExTopLevelDirectoriesTraversal(path, filter, OnLogError) : /*TraverseDirectoriesCore(path, filter)*/ExTraverseDirectoriesCore(path, filter, OnLogError);
 		}
 
 		/// <summary>
@@ -355,7 +355,7 @@ namespace System.IO.SafeTraversal.Core
 			if (string.IsNullOrEmpty(path)) throw new ArgumentNullException(nameof(path), "`path` cannot be null");
 			if (!Directory.Exists(path)) throw new DirectoryNotFoundException($"{path} doesn't exist");
 
-			return searchOption == SearchOption.TopDirectoryOnly ? TopLevelFilesTraversal(path) : TraverseFilesCore(path);
+			return searchOption == SearchOption.TopDirectoryOnly ? /*TopLevelFilesTraversal(path)*/ExTopLevelFilesTraversal(path, onLogError: OnLogError) : /*TraverseFilesCore(path)*/ExTraverseFilesCore(path, onLogError: OnLogError);
 		}
 
 		/// <summary>
@@ -374,7 +374,7 @@ namespace System.IO.SafeTraversal.Core
 			if (!Directory.Exists(path)) throw new DirectoryNotFoundException($"{path} doesn't exist");
 			if (filter == null) throw new ArgumentNullException(nameof(filter), "`filter` cannot be null");
 
-			return searchOption == SearchOption.TopDirectoryOnly ? TopLevelFilesTraversal(path, filter) : TraverseFilesCore(path, filter);
+			return searchOption == SearchOption.TopDirectoryOnly ? /*TopLevelFilesTraversal(path, filter)*/ ExTopLevelFilesTraversal(path, filter, OnLogError) : /*TraverseFilesCore(path, filter)*/ExTraverseFilesCore(path, filter, OnLogError);
 		}
 
 		/// <summary>
@@ -539,7 +539,7 @@ namespace System.IO.SafeTraversal.Core
 			if (string.IsNullOrEmpty(path)) throw new ArgumentNullException(nameof(path), "`path` cannot be null");
 			if (!Directory.Exists(path)) throw new DirectoryNotFoundException($"{path} doesn't exist");
 
-			return searchOption == SearchOption.TopDirectoryOnly ? TopLevelDirectoriesTraversal(path) : TraverseDirectoriesCore(path);
+			return searchOption == SearchOption.TopDirectoryOnly ? /*TopLevelDirectoriesTraversal(path)*/ExTopLevelDirectoriesTraversal(path, onLogError: OnLogError) : /*TraverseDirectoriesCore(path)*/ExTraverseDirectoriesCore(path, onLogError: OnLogError);
 		}
 
 		/// <summary>
@@ -558,7 +558,7 @@ namespace System.IO.SafeTraversal.Core
 			if (!Directory.Exists(path)) throw new DirectoryNotFoundException($"{path} doesn't exist");
 			if (filter == null) throw new ArgumentNullException(nameof(filter), "`filter` cannot be null");
 
-			return searchOption == SearchOption.TopDirectoryOnly ? TopLevelDirectoriesTraversal(path, filter) : TraverseDirectoriesCore(path, filter);
+			return searchOption == SearchOption.TopDirectoryOnly ? /*TopLevelDirectoriesTraversal(path, filter)*/ExTopLevelDirectoriesTraversal(path, filter, OnLogError) : /*TraverseDirectoriesCore(path, filter)*/ExTraverseDirectoriesCore(path, filter, OnLogError);
 		}
 
 		/// <summary>
