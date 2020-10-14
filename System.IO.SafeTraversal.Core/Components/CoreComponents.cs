@@ -5,24 +5,20 @@ namespace System.IO.SafeTraversal.Core
 {
 	public partial class SafeTraversal
 	{
-		enum SizeConverterType
-		{
-			LowerBound,
-			UpperBound
-		}
+		private enum SizeConverterType { LowerBound, UpperBound }
 
 		#region FILE
 		private static long SizeConverter(double size, SizeType type, SizeConverterType converterType)
 		{
 			try
 			{
-				double result = 0;
 				if (size == 0) size = +1;
-				switch (converterType)
+				var result = converterType switch
 				{
-					case SizeConverterType.LowerBound: result = Math.Floor((size - 1) * Math.Pow(1024, (int)type)); break;
-					case SizeConverterType.UpperBound: result = Math.Ceiling((size + 1) * Math.Pow(1024, (int)type)); break;
-				}
+					SizeConverterType.LowerBound => Math.Floor((size - 1) * Math.Pow(1024, (int)type)),
+					SizeConverterType.UpperBound => Math.Ceiling((size + 1) * Math.Pow(1024, (int)type)),
+					_ => 0
+				};
 				return result >= long.MaxValue ? -1 : Convert.ToInt64(result);
 			}
 			catch { return -1; }
@@ -40,9 +36,7 @@ namespace System.IO.SafeTraversal.Core
 		{
 			lowerBoundSize++; // TODO: Hmm...
 
-			if (lowerBoundSize < 0) return false;
-			if (upperBoundSize < 0) return false;
-			if (lowerBoundSize >= upperBoundSize) return false;
+			if (lowerBoundSize < 0 || upperBoundSize < 0 || lowerBoundSize >= upperBoundSize) return false;
 
 			var lowerBound = SizeConverter(lowerBoundSize, sizeType, SizeConverterType.LowerBound); if (lowerBound < 0) return false;
 			var upperBound = SizeConverter(upperBoundSize, sizeType, SizeConverterType.UpperBound); if (upperBound < 0) return false;
@@ -53,7 +47,7 @@ namespace System.IO.SafeTraversal.Core
 		private static bool MatchByDate(FileInfo fileInfo, DateTime dateTime, DateComparisonType comparisonType)
 		{
 			var fileInfoDate = GetDateComparisonType(fileInfo, comparisonType);
-			return DateTime.Equals(fileInfoDate.Date, dateTime.Date);
+			return DateTime.Equals(fileInfoDate.Date, dateTime.Date); // TODO: Precision?
 		}
 
 		private static bool MatchByDateRange(FileInfo fileInfo, DateTime lowerBoundDate, DateTime upperBoundDate, DateComparisonType comparisonType)
@@ -89,17 +83,17 @@ namespace System.IO.SafeTraversal.Core
 		private static bool MatchByExtension(FileInfo fileInfo, string extension)
 		{
 			extension = Regex.Match(extension, @"(\.)?\w+").Value;
-			if (!extension.StartsWith(".")) extension = "." + extension;
+			if (!extension.StartsWith(".")) extension = $".{extension}";
 			return fileInfo.Extension.Equals(extension, StringComparison.InvariantCultureIgnoreCase);
 		}
 
 		private static bool MatchByAttributes(FileInfo fileInfo, FileAttributes fileAttributes) => fileInfo.Attributes == fileAttributes;
 
-		private static bool MatchByName(FileInfo fileInfo, string keyword, StringComparison stringComparison) =>
-			Path.GetFileNameWithoutExtension(fileInfo.Name).Equals(keyword, stringComparison);
+		private static bool MatchByName(FileInfo fileInfo, string keyword, StringComparison stringComparison)
+			=> Path.GetFileNameWithoutExtension(fileInfo.Name).Equals(keyword, stringComparison);
 
-		private static bool MatchByNameWithExtension(FileInfo fileInfo, string keyword, StringComparison stringComparison) =>
-			fileInfo.Name.Equals(keyword, stringComparison);
+		private static bool MatchByNameWithExtension(FileInfo fileInfo, string keyword, StringComparison stringComparison)
+			=> fileInfo.Name.Equals(keyword, stringComparison);
 
 		private static bool MatchByCommonSize(FileInfo fileInfo, CommonSize commonSize) => commonSize switch
 		{
@@ -143,46 +137,27 @@ namespace System.IO.SafeTraversal.Core
 		private static bool TranslateFileOptions(FileInfo fileInfo, SafeTraversalFileSearchOptions options)
 		{
 			var queueResult = new Queue<bool>();
-			if (options.FileNameOption != null)
+
+			if (options.FileNameOption is not null)
 			{
 				var stringComparison = options.FileNameOption.CaseSensitive ? StringComparison.InvariantCulture : StringComparison.InvariantCultureIgnoreCase;
-				queueResult.Enqueue(options.FileNameOption.IncludeExtension ?
-					MatchByNameWithExtension(fileInfo, options.FileNameOption.Name, stringComparison) :
-					MatchByName(fileInfo, options.FileNameOption.Name, stringComparison));
+
+				queueResult.Enqueue(options.FileNameOption.IncludeExtension
+					? MatchByNameWithExtension(fileInfo, options.FileNameOption.Name, stringComparison)
+					: MatchByName(fileInfo, options.FileNameOption.Name, stringComparison));
 			}
-			if (!string.IsNullOrEmpty(options.Extension))
+			if (!string.IsNullOrEmpty(options.Extension)) queueResult.Enqueue(MatchByExtension(fileInfo, options.Extension!)); // Not null here!
+			if (options.FileAttributes != 0) queueResult.Enqueue(MatchByAttributes(fileInfo, options.FileAttributes));
+			if (options.CommonSize != 0) queueResult.Enqueue(MatchByCommonSize(fileInfo, options.CommonSize));
+			if (options.SizeOption is not null) queueResult.Enqueue(MatchBySize(fileInfo, options.SizeOption.Size, options.SizeOption.SizeType));
+			if (options.SizeRangeOption is not null) queueResult.Enqueue(MatchBySizeRange(fileInfo, options.SizeRangeOption.LowerBoundSize, options.SizeRangeOption.UpperBoundSize, options.SizeRangeOption.SizeType));
+			if (options.DateOption is not null) queueResult.Enqueue(MatchByDate(fileInfo, options.DateOption.Date, options.DateOption.DateComparisonType));
+			if (options.DateRangeOption is not null) queueResult.Enqueue(MatchByDateRange(fileInfo, options.DateRangeOption.LowerBoundDate, options.DateRangeOption.UpperBoundDate, options.DateRangeOption.DateComparisonType));
+			if (options.RegularExpressionOption is not null)
 			{
-				queueResult.Enqueue(MatchByExtension(fileInfo, options.Extension!)); // Not null here!
-			}
-			if (options.FileAttributes != 0)
-			{
-				queueResult.Enqueue(MatchByAttributes(fileInfo, options.FileAttributes));
-			}
-			if (options.CommonSize != 0)
-			{
-				queueResult.Enqueue(MatchByCommonSize(fileInfo, options.CommonSize));
-			}
-			if (options.SizeOption != null)
-			{
-				queueResult.Enqueue(MatchBySize(fileInfo, options.SizeOption.Size, options.SizeOption.SizeType));
-			}
-			if (options.SizeRangeOption != null)
-			{
-				queueResult.Enqueue(MatchBySizeRange(fileInfo, options.SizeRangeOption.LowerBoundSize, options.SizeRangeOption.UpperBoundSize, options.SizeRangeOption.SizeType));
-			}
-			if (options.DateOption != null)
-			{
-				queueResult.Enqueue(MatchByDate(fileInfo, options.DateOption.Date, options.DateOption.DateComparisonType));
-			}
-			if (options.DateRangeOption != null)
-			{
-				queueResult.Enqueue(MatchByDateRange(fileInfo, options.DateRangeOption.LowerBoundDate, options.DateRangeOption.UpperBoundDate, options.DateRangeOption.DateComparisonType));
-			}
-			if (options.RegularExpressionOption != null)
-			{
-				queueResult.Enqueue(options.RegularExpressionOption.IncludeExtension ?
-					MatchByPatternWithExtension(fileInfo, options.RegularExpressionOption.Pattern) :
-					MatchByPattern(fileInfo, options.RegularExpressionOption.Pattern));
+				queueResult.Enqueue(options.RegularExpressionOption.IncludeExtension
+					? MatchByPatternWithExtension(fileInfo, options.RegularExpressionOption.Pattern)
+					: MatchByPattern(fileInfo, options.RegularExpressionOption.Pattern));
 			}
 
 			if (queueResult.Count == 0) return false;
@@ -201,16 +176,15 @@ namespace System.IO.SafeTraversal.Core
 		private static bool TranslateDirOptions(DirectoryInfo directoryInfo, SafeTraversalDirectorySearchOptions options)
 		{
 			var queueResult = new Queue<bool>();
-			if (options.DirectoryNameOption != null)
+
+			if (options.DirectoryNameOption is not null)
 			{
 				var stringComparison = options.DirectoryNameOption.CaseSensitive ? StringComparison.InvariantCulture : StringComparison.InvariantCultureIgnoreCase;
 				queueResult.Enqueue(MatchDirByName(directoryInfo, options.DirectoryNameOption.Name, stringComparison));
 			}
-			queueResult.Enqueue(MatchDirByAttributes(directoryInfo, options.DirectoryAttributes));
-			if (options.DateOption != null)
-				queueResult.Enqueue(MatchDirByDate(directoryInfo, options.DateOption.Date, options.DateOption.DateComparisonType));
-			if (options.RegularExpressionOption != null)
-				queueResult.Enqueue(MatchDirByPattern(directoryInfo, options.RegularExpressionOption.Pattern));
+			queueResult.Enqueue(MatchDirByAttributes(directoryInfo, options.DirectoryAttributes)); // TODO: if null ?
+			if (options.DateOption is not null) queueResult.Enqueue(MatchDirByDate(directoryInfo, options.DateOption.Date, options.DateOption.DateComparisonType));
+			if (options.RegularExpressionOption is not null) queueResult.Enqueue(MatchDirByPattern(directoryInfo, options.RegularExpressionOption.Pattern));
 
 			if (queueResult.Count == 0) return false;
 

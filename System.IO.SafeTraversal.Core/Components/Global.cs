@@ -36,15 +36,15 @@
 	public enum DateComparisonType
 	{
 		/// <summary>
-		/// Filter based on creation date
+		/// Filter based on creation date.
 		/// </summary>
 		CreationDate = 1,
 		/// <summary>
-		/// Filter based on last modification date
+		/// Filter based on last modification date.
 		/// </summary>
 		LastModificationDate = 2,
 		/// <summary>
-		/// Filter based on last access date
+		/// Filter based on last access date.
 		/// </summary>
 		LastAccessDate = 3
 	}
@@ -66,7 +66,7 @@
 		/// </summary>
 		Small = 3,
 		/// <summary>
-		/// 100 KB .. 1MB
+		/// 100 KB .. 1 MB
 		/// </summary>
 		Medium = 4,
 		/// <summary>
@@ -87,7 +87,7 @@
 	/// </summary>
 	public sealed class SearchFileByNameOption
 	{
-		////private SearchFileByNameOption() { }
+		//private SearchFileByNameOption() { }
 		/// <summary>
 		/// Default constructor for SearchFileByNameOption.
 		/// </summary>
@@ -118,7 +118,7 @@
 	/// </summary>
 	public sealed class SearchFileBySizeOption
 	{
-		private SearchFileBySizeOption() { }
+		//private SearchFileBySizeOption() { }
 		/// <summary>
 		/// Default constructor for instantiating SearchFileBySizeOption class.
 		/// </summary>
@@ -143,7 +143,7 @@
 	/// </summary>
 	public sealed class SearchFileBySizeRangeOption
 	{
-		private SearchFileBySizeRangeOption() { }
+		//private SearchFileBySizeRangeOption() { }
 		/// <summary>
 		/// Default constructor.
 		/// </summary>
@@ -174,7 +174,7 @@
 	/// </summary>
 	public sealed class SearchFileByDateOption
 	{
-		private SearchFileByDateOption() { }
+		//private SearchFileByDateOption() { }
 		/// <summary>
 		/// Default constructor for instantiating this class.
 		/// </summary>
@@ -184,7 +184,6 @@
 		{
 			Date = date;
 			DateComparisonType = dateComparisonType;
-
 		}
 		/// <summary>
 		/// Gets date that is used for filtering.
@@ -194,19 +193,18 @@
 		/// Gets date comparison type.
 		/// </summary>
 		public DateComparisonType DateComparisonType { get; private set; }
-
 	}
 	/// <summary>
 	/// Option class for searching files based on date range in specified date comparison type.
 	/// </summary>
 	public sealed class SearchFileByDateRangeOption
 	{
-		private SearchFileByDateRangeOption() { }
+		//private SearchFileByDateRangeOption() { }
 		/// <summary>
 		/// Default constructor for instantiating this class.
 		/// </summary>
 		/// <param name="lowerBoundDate">Lower bound date. Please, specifiy in date format only.</param>
-		/// <param name="upperBoundDate">Upper bound date. Please, specifiy in date format only,</param>
+		/// <param name="upperBoundDate">Upper bound date. Please, specifiy in date format only.</param>
 		/// <param name="dateComparisonType">Date comparison type.</param>
 		public SearchFileByDateRangeOption(DateTime lowerBoundDate, DateTime upperBoundDate, DateComparisonType dateComparisonType)
 		{
@@ -282,7 +280,7 @@
 	/// </summary>
 	public sealed class SearchDirectoryByRegularExpressionOption
 	{
-		////private SearchDirectoryByRegularExpressionOption() { }
+		//private SearchDirectoryByRegularExpressionOption() { }
 		/// <summary>
 		/// Default constructor.
 		/// </summary>
@@ -298,7 +296,7 @@
 	/// </summary>
 	public sealed class SearchDirectoryByDateOption
 	{
-		private SearchDirectoryByDateOption() { }
+		//private SearchDirectoryByDateOption() { }
 		/// <summary>
 		/// Default constructor.
 		/// </summary>
@@ -308,7 +306,6 @@
 		{
 			Date = date;
 			DateComparisonType = dateComparisonType;
-
 		}
 		/// <summary>
 		/// Gets date specified for filtering.
@@ -318,6 +315,5 @@
 		/// Gets date comparison type.
 		/// </summary>
 		public DateComparisonType DateComparisonType { get; private set; }
-
 	}
 }
