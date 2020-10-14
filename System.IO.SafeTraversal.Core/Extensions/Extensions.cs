@@ -243,7 +243,7 @@ namespace System.IO.SafeTraversal.Core
 		/// <exception cref="DirectoryNotFoundException">`path` doesn't exist.</exception>
 		public static IEnumerable<DirectoryInfo> GetDirectories(DirectoryInfo path, SearchOption searchOption, FileAttributes attributes)
 		{
-			return GetDirectories(path, searchOption, (dirInfo) => MatchDirByAttributes(dirInfo, attributes));
+			return GetDirectories(path, searchOption, (dirInfo) => MatchByAttributes(dirInfo, attributes));
 		}
 
 		/// <summary>
@@ -260,7 +260,7 @@ namespace System.IO.SafeTraversal.Core
 		{
 			if (searchDirectoryByDateOption is null) throw new ArgumentNullException(nameof(searchDirectoryByDateOption), "`searchDirectoryByDateOption` cannot be null");
 
-			return GetDirectories(path, searchOption, (dirInfo) => MatchDirByDate(dirInfo, searchDirectoryByDateOption.Date, searchDirectoryByDateOption.DateComparisonType));
+			return GetDirectories(path, searchOption, (dirInfo) => MatchByDate(dirInfo, searchDirectoryByDateOption.Date, searchDirectoryByDateOption.DateComparisonType));
 		}
 
 		/// <summary>
@@ -280,7 +280,7 @@ namespace System.IO.SafeTraversal.Core
 
 			var stringComparison = searchDirectoryByName.CaseSensitive ? StringComparison.InvariantCulture : StringComparison.InvariantCultureIgnoreCase;
 
-			return GetDirectories(path, searchOption, (dirInfo) => MatchDirByName(dirInfo, searchDirectoryByName.Name, stringComparison));
+			return GetDirectories(path, searchOption, (dirInfo) => MatchByName(dirInfo, searchDirectoryByName.Name, stringComparison));
 		}
 
 		/// <summary>
@@ -297,7 +297,7 @@ namespace System.IO.SafeTraversal.Core
 		{
 			if (searchDirectoryByRegularExpressionPattern is null) throw new ArgumentNullException(nameof(searchDirectoryByRegularExpressionPattern), "`searchDirectoryByRegularExpressionPattern` cannot be null");
 
-			return GetDirectories(path, searchOption, (dirInfo) => MatchDirByPattern(dirInfo, searchDirectoryByRegularExpressionPattern.Pattern));
+			return GetDirectories(path, searchOption, (dirInfo) => MatchByPattern(dirInfo, searchDirectoryByRegularExpressionPattern.Pattern));
 		}
 
 		/// <summary>
@@ -557,7 +557,7 @@ namespace System.IO.SafeTraversal.Core
 		/// <exception cref="DirectoryNotFoundException">`path` doesn't exist.</exception>
 		public static IEnumerable<string> GetDirectories(string path, SearchOption searchOption, FileAttributes attributes)
 		{
-			return GetDirectories(path, searchOption, (dirInfo) => MatchDirByAttributes(dirInfo, attributes)); // TODO: ArgumentException?
+			return GetDirectories(path, searchOption, (dirInfo) => MatchByAttributes(dirInfo, attributes)); // TODO: ArgumentException?
 		}
 
 		/// <summary>
@@ -574,7 +574,7 @@ namespace System.IO.SafeTraversal.Core
 		{
 			if (searchDirectoryByDateOption is null) throw new ArgumentNullException(nameof(searchDirectoryByDateOption), "`searchDirectoryByDateOption` cannot be null");
 
-			return GetDirectories(path, searchOption, (dirInfo) => MatchDirByDate(dirInfo, searchDirectoryByDateOption.Date, searchDirectoryByDateOption.DateComparisonType));
+			return GetDirectories(path, searchOption, (dirInfo) => MatchByDate(dirInfo, searchDirectoryByDateOption.Date, searchDirectoryByDateOption.DateComparisonType));
 		}
 
 		/// <summary>
@@ -593,7 +593,7 @@ namespace System.IO.SafeTraversal.Core
 
 			var stringComparison = searchDirectoryByName.CaseSensitive ? StringComparison.InvariantCulture : StringComparison.InvariantCultureIgnoreCase;
 
-			return GetDirectories(path, searchOption, (dirInfo) => MatchDirByName(dirInfo, searchDirectoryByName.Name, stringComparison));
+			return GetDirectories(path, searchOption, (dirInfo) => MatchByName(dirInfo, searchDirectoryByName.Name, stringComparison));
 		}
 
 		/// <summary>
@@ -610,7 +610,7 @@ namespace System.IO.SafeTraversal.Core
 		{
 			if (searchDirectoryByRegularExpressionPattern is null) throw new ArgumentNullException(nameof(searchDirectoryByRegularExpressionPattern), "`searchDirectoryByRegularExpressionPattern` cannot be null");
 
-			return GetDirectories(path, searchOption, (dirInfo) => MatchDirByPattern(dirInfo, searchDirectoryByRegularExpressionPattern.Pattern));
+			return GetDirectories(path, searchOption, (dirInfo) => MatchByPattern(dirInfo, searchDirectoryByRegularExpressionPattern.Pattern));
 		}
 
 		/// <summary>

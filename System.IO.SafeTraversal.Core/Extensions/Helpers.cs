@@ -16,12 +16,13 @@ namespace System.IO.SafeTraversal.Core
 		{
 			if (!path.Exists) throw new DirectoryNotFoundException();
 
-			while (path.Parent != null)
+			while (path.Parent is not null)
 			{
 				yield return new DirectoryInfo(path.Parent.Name);
 				path = path.Parent;
 			}
 		}
+
 		/// <summary>
 		/// Find all parents all the way up to the root (ie: C:\ or D:\) from current path.
 		/// </summary>
@@ -29,17 +30,24 @@ namespace System.IO.SafeTraversal.Core
 		/// <returns>IEnumerable of DirectoryInfo representing all parents.</returns>
 		public static IEnumerable<DirectoryInfo> FindParents(this FileInfo file)
 		{
-
 			if (!file.Exists) throw new FileNotFoundException();
 
 			var path = new DirectoryInfo(Path.GetDirectoryName(file.FullName));
 			yield return new DirectoryInfo(path.Name);
 
-			while (path.Parent != null)
+			while (path.Parent is not null)
 			{
 				yield return new DirectoryInfo(path.Parent.Name);
 				path = path.Parent;
 			}
+		}
+
+		internal static bool Pass<T>(this T x, Func<T, bool> filter) where T : FileSystemInfo
+		{
+			var success = true; // Why? It prevents exception being thrown inside filter.
+			try { success = filter(x); }
+			catch { success = false; }
+			return success;
 		}
 	}
 }

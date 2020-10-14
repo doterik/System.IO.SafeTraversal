@@ -7,7 +7,6 @@ namespace System.IO.SafeTraversal.Core
 	{
 		private enum SizeConverterType { LowerBound, UpperBound }
 
-		#region FILE
 		private static long SizeConverter(double size, SizeType type, SizeConverterType converterType)
 		{
 			try
@@ -22,6 +21,88 @@ namespace System.IO.SafeTraversal.Core
 				return result >= long.MaxValue ? -1 : Convert.ToInt64(result);
 			}
 			catch { return -1; }
+		}
+
+		private static DateTime GetDateComparisonType(FileSystemInfo fileSystemInfo, DateComparisonType dateComparisonType) => dateComparisonType switch
+		{
+			DateComparisonType.CreationDate => fileSystemInfo.CreationTime.Date,
+			DateComparisonType.LastModificationDate => fileSystemInfo.LastWriteTime.Date,
+			DateComparisonType.LastAccessDate => fileSystemInfo.LastAccessTime.Date,
+			_ => new DateTime()
+		};
+
+		#region MatchBy
+		private static bool MatchByAttributes(FileSystemInfo fileSystemInfo, FileAttributes fileAttributes) => fileSystemInfo.Attributes == fileAttributes; // Default..
+
+		private static bool MatchByCommonSize(FileInfo fileInfo, CommonSize commonSize) => commonSize switch
+		{
+			CommonSize.Empty => fileInfo.Length == 0,
+			CommonSize.Tiny => MatchBySizeRange(fileInfo, 1, 10, SizeType.KiloBytes),
+			CommonSize.Small => MatchBySizeRange(fileInfo, 11, 100, SizeType.KiloBytes),
+			CommonSize.Medium => MatchBySizeRange(fileInfo, 101, 1000, SizeType.KiloBytes),
+			CommonSize.Large => MatchBySizeRange(fileInfo, 2, 16, SizeType.MegaBytes),
+			CommonSize.Huge => MatchBySizeRange(fileInfo, 17, 128, SizeType.MegaBytes),
+			_ => fileInfo.Length > SizeConverter(129, SizeType.MegaBytes, SizeConverterType.LowerBound) // CommonSize.Gigantic
+		};
+
+		private static bool MatchByDate<T>(T fileSystemInfo, DateTime dateTime, DateComparisonType dateComparisonType) where T : FileSystemInfo
+		{
+			switch (fileSystemInfo)
+			{
+				case FileInfo fi:
+					var fiDate = GetDateComparisonType(fi, dateComparisonType);
+					return DateTime.Equals(fiDate.Date, dateTime.Date); // TODO: Precision?
+
+				case DirectoryInfo di:
+					var diDate = GetDateComparisonType(di, dateComparisonType);
+					return DateTime.Equals(diDate.Date, dateTime.Date); // TODO: Precision?
+
+				default: return false; throw new NotSupportedException($"{typeof(T).Name}");
+			};
+		}
+
+		private static bool MatchByDateRange(FileInfo fileInfo, DateTime lowerBoundDate, DateTime upperBoundDate, DateComparisonType comparisonType)
+		{
+			var fileInfoDate = GetDateComparisonType(fileInfo, comparisonType);
+			return fileInfoDate >= lowerBoundDate.Date && fileInfoDate <= upperBoundDate.Date;
+		}
+
+		private static bool MatchByExtension(FileInfo fileInfo, string extension)
+		{
+			extension = Regex.Match(extension, @"(\.)?\w+").Value;
+			if (!extension.StartsWith(".")) extension = $".{extension}";
+			return fileInfo.Extension.Equals(extension, StringComparison.InvariantCultureIgnoreCase);
+		}
+
+		private static bool MatchByName<T>(T fileSystemInfo, string keyword, StringComparison stringComparison) where T : FileSystemInfo // T redundant!
+		{
+			return fileSystemInfo switch
+			{
+				FileInfo fi => Path.GetFileNameWithoutExtension(fi.Name).Equals(keyword, stringComparison),
+				DirectoryInfo di => di.Name.Equals(keyword, stringComparison),
+				_ => throw new NotSupportedException($"{typeof(T).Name}")
+			};
+		}
+
+		private static bool MatchByNameWithExtension(FileInfo fileInfo, string keyword, StringComparison stringComparison)
+			=> fileInfo.Name.Equals(keyword, stringComparison);
+
+		private static bool MatchByPattern(FileSystemInfo fileSystemInfo, string pattern)
+		{
+			var name = fileSystemInfo is FileInfo ? Path.GetFileNameWithoutExtension(fileSystemInfo.Name) : fileSystemInfo.Name;
+
+			bool result;
+			try { result = Regex.IsMatch(name, pattern, RegexOptions.Compiled); }  // TODO: Compiled !?
+			catch { result = false; }
+			return result;
+		}
+
+		private static bool MatchByPatternWithExtension(FileInfo fileInfo, string pattern)
+		{
+			bool result;
+			try { result = Regex.IsMatch(fileInfo.Name, pattern, RegexOptions.Compiled); } // TODO: Compiled !?
+			catch { result = false; }
+			return result;
 		}
 
 		private static bool MatchBySize(FileInfo fileInfo, double size, SizeType sizeType)
@@ -42,94 +123,6 @@ namespace System.IO.SafeTraversal.Core
 			var upperBound = SizeConverter(upperBoundSize, sizeType, SizeConverterType.UpperBound); if (upperBound < 0) return false;
 
 			return fileInfo.Length >= lowerBound && fileInfo.Length <= upperBound;
-		}
-
-		private static bool MatchByDate(FileInfo fileInfo, DateTime dateTime, DateComparisonType comparisonType)
-		{
-			var fileInfoDate = GetDateComparisonType(fileInfo, comparisonType);
-			return DateTime.Equals(fileInfoDate.Date, dateTime.Date); // TODO: Precision?
-		}
-
-		private static bool MatchByDateRange(FileInfo fileInfo, DateTime lowerBoundDate, DateTime upperBoundDate, DateComparisonType comparisonType)
-		{
-			var fileInfoDate = GetDateComparisonType(fileInfo, comparisonType);
-			return fileInfoDate >= lowerBoundDate.Date && fileInfoDate <= upperBoundDate.Date;
-		}
-
-		private static DateTime GetDateComparisonType(FileInfo fileInfo, DateComparisonType comparisonType) => comparisonType switch
-		{
-			DateComparisonType.CreationDate => fileInfo.CreationTime.Date,
-			DateComparisonType.LastModificationDate => fileInfo.LastWriteTime.Date,
-			DateComparisonType.LastAccessDate => fileInfo.LastAccessTime.Date,
-			_ => new DateTime()
-		};
-
-		private static bool MatchByPattern(FileInfo fileInfo, string pattern)
-		{
-			bool result;
-			try { result = Regex.IsMatch(Path.GetFileNameWithoutExtension(fileInfo.Name), pattern, RegexOptions.Compiled); } // TODO: Compiled !?
-			catch { result = false; }
-			return result;
-		}
-
-		private static bool MatchByPatternWithExtension(FileInfo fileInfo, string pattern)
-		{
-			bool result;
-			try { result = Regex.IsMatch(fileInfo.Name, pattern, RegexOptions.Compiled); } // TODO: Compiled !?
-			catch { result = false; }
-			return result;
-		}
-
-		private static bool MatchByExtension(FileInfo fileInfo, string extension)
-		{
-			extension = Regex.Match(extension, @"(\.)?\w+").Value;
-			if (!extension.StartsWith(".")) extension = $".{extension}";
-			return fileInfo.Extension.Equals(extension, StringComparison.InvariantCultureIgnoreCase);
-		}
-
-		private static bool MatchByAttributes(FileInfo fileInfo, FileAttributes fileAttributes) => fileInfo.Attributes == fileAttributes;
-
-		private static bool MatchByName(FileInfo fileInfo, string keyword, StringComparison stringComparison)
-			=> Path.GetFileNameWithoutExtension(fileInfo.Name).Equals(keyword, stringComparison);
-
-		private static bool MatchByNameWithExtension(FileInfo fileInfo, string keyword, StringComparison stringComparison)
-			=> fileInfo.Name.Equals(keyword, stringComparison);
-
-		private static bool MatchByCommonSize(FileInfo fileInfo, CommonSize commonSize) => commonSize switch
-		{
-			CommonSize.Empty => fileInfo.Length == 0,
-			CommonSize.Tiny => MatchBySizeRange(fileInfo, 1, 10, SizeType.KiloBytes),
-			CommonSize.Small => MatchBySizeRange(fileInfo, 11, 100, SizeType.KiloBytes),
-			CommonSize.Medium => MatchBySizeRange(fileInfo, 101, 1000, SizeType.KiloBytes),
-			CommonSize.Large => MatchBySizeRange(fileInfo, 2, 16, SizeType.MegaBytes),
-			CommonSize.Huge => MatchBySizeRange(fileInfo, 17, 128, SizeType.MegaBytes),
-			_ => fileInfo.Length > SizeConverter(129, SizeType.MegaBytes, SizeConverterType.LowerBound) // CommonSize.Gigantic
-		};
-		#endregion
-
-		#region DIRECTORY
-		private static bool MatchDirByName(DirectoryInfo directoryInfo, string keyword, StringComparison stringComparison) => directoryInfo.Name.Equals(keyword, stringComparison);
-
-		private static bool MatchDirByDate(DirectoryInfo directoryInfo, DateTime date, DateComparisonType dateComparisonType)
-		{
-			var dirInfoDate = dateComparisonType switch
-			{
-				DateComparisonType.CreationDate => directoryInfo.CreationTime,
-				DateComparisonType.LastAccessDate => directoryInfo.LastAccessTime,
-				DateComparisonType.LastModificationDate => directoryInfo.LastWriteTime,
-				_ => new DateTime(),
-			};
-			return DateTime.Equals(dirInfoDate.Date, date.Date);
-		}
-
-		private static bool MatchDirByAttributes(DirectoryInfo directoryInfo, FileAttributes fileAttributes = FileAttributes.Directory) => directoryInfo.Attributes == fileAttributes;
-
-		private static bool MatchDirByPattern(DirectoryInfo directoryInfo, string pattern)
-		{
-			bool result;
-			try { result = Regex.IsMatch(directoryInfo.Name, pattern, RegexOptions.Compiled); }
-			catch { result = false; }
-			return result;
 		}
 		#endregion
 
@@ -180,11 +173,12 @@ namespace System.IO.SafeTraversal.Core
 			if (options.DirectoryNameOption is not null)
 			{
 				var stringComparison = options.DirectoryNameOption.CaseSensitive ? StringComparison.InvariantCulture : StringComparison.InvariantCultureIgnoreCase;
-				queueResult.Enqueue(MatchDirByName(directoryInfo, options.DirectoryNameOption.Name, stringComparison));
+				queueResult.Enqueue(MatchByName(directoryInfo, options.DirectoryNameOption.Name, stringComparison));
 			}
-			queueResult.Enqueue(MatchDirByAttributes(directoryInfo, options.DirectoryAttributes)); // TODO: if null ?
-			if (options.DateOption is not null) queueResult.Enqueue(MatchDirByDate(directoryInfo, options.DateOption.Date, options.DateOption.DateComparisonType));
-			if (options.RegularExpressionOption is not null) queueResult.Enqueue(MatchDirByPattern(directoryInfo, options.RegularExpressionOption.Pattern));
+			queueResult.Enqueue(MatchByAttributes(directoryInfo, options.DirectoryAttributes)); // TODO: if null ?
+
+			if (options.DateOption is not null) queueResult.Enqueue(MatchByDate(directoryInfo, options.DateOption.Date, options.DateOption.DateComparisonType));
+			if (options.RegularExpressionOption is not null) queueResult.Enqueue(MatchByPattern(directoryInfo, options.RegularExpressionOption.Pattern));
 
 			if (queueResult.Count == 0) return false;
 

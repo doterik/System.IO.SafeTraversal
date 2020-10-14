@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+
 namespace System.IO.SafeTraversal.Core
 {
 	public partial class SafeTraversal
@@ -12,14 +13,7 @@ namespace System.IO.SafeTraversal.Core
 			{
 				files = filter is null
 					? path.GetFiles()
-					: path.GetFiles().Where(x =>
-					{
-						var success = true; // Why? It prevents exception being thrown inside filter.
-						try { success = filter(x); }
-						catch { success = false; }
-						return success;
-					})
-					.ToArray();
+					: path.GetFiles().Where(x => x.Pass(filter)).ToArray();
 			}
 			catch (UnauthorizedAccessException ex)
 			{
@@ -42,14 +36,7 @@ namespace System.IO.SafeTraversal.Core
 			{
 				files = filter is null
 					? Directory.GetFiles(path)
-					: new DirectoryInfo(path).GetFiles().Where(x =>
-					{
-						var success = true; // Why? It prevents exception being thrown inside filter.
-						try { success = filter(x); }
-						catch { success = false; }
-						return success;
-					})
-					.Select(x => x.FullName).ToArray();
+					: new DirectoryInfo(path).GetFiles().Where(x => x.Pass(filter)).Select(x => x.FullName).ToArray();
 			}
 			catch (UnauthorizedAccessException ex)
 			{
@@ -72,14 +59,7 @@ namespace System.IO.SafeTraversal.Core
 			{
 				dirs = filter is null
 					? path.GetDirectories()
-					: path.GetDirectories().Where(x =>
-					{
-						var success = true; // Why? It prevents exception being thrown inside filter.
-						try { success = filter(x); }
-						catch { success = false; }
-						return success;
-					})
-					.ToArray();
+					: path.GetDirectories().Where(x => x.Pass(filter)).ToArray();
 			}
 			catch (UnauthorizedAccessException ex)
 			{
@@ -102,14 +82,7 @@ namespace System.IO.SafeTraversal.Core
 			{
 				dirs = filter is null
 					? Directory.GetDirectories(path)
-					: new DirectoryInfo(path).GetDirectories(path).Where(x =>
-					{
-						var success = true; // Why? It prevents exception being thrown inside filter.
-						try { success = filter(x); }
-						catch { success = false; }
-						return success;
-					})
-					.Select(x => x.FullName).ToArray();
+					: new DirectoryInfo(path).GetDirectories(path).Where(x => x.Pass(filter)).Select(x => x.FullName).ToArray();
 			}
 			catch (UnauthorizedAccessException ex)
 			{
@@ -139,14 +112,7 @@ namespace System.IO.SafeTraversal.Core
 				{
 					files = filter is null
 						? currentDir.GetFiles()
-						: currentDir.GetFiles().Where(x =>
-						{
-							var success = true; // Why? It prevents exception being thrown inside filter.
-							try { success = filter(x); }
-							catch { success = false; }
-							return success;
-						})
-						.ToArray();
+						: currentDir.GetFiles().Where(x => x.Pass(filter)).ToArray();
 				}
 				catch (UnauthorizedAccessException ex)
 				{
@@ -193,14 +159,7 @@ namespace System.IO.SafeTraversal.Core
 				{
 					files = filter is null
 						? Directory.GetFiles(currentDir)
-						: new DirectoryInfo(currentDir).GetFiles().Where(x =>
-						{
-							var success = true; // Why? It prevents exception being thrown inside filter.
-							try { success = filter(x); }
-							catch { success = false; }
-							return success;
-						})
-						.Select(x => x.FullName).ToArray();
+						: new DirectoryInfo(currentDir).GetFiles().Where(x => x.Pass(filter)).Select(x => x.FullName).ToArray();
 				}
 				catch (UnauthorizedAccessException ex)
 				{
