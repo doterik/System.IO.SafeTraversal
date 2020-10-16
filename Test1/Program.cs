@@ -17,6 +17,15 @@ namespace Test1
 			TraverseFiles_StateUnderTest_ExpectedBehavior();
 			TraverseFiles_DirectoryInfo_AllDirectories_SearchFileByNameOption();
 		}
+		void A()
+
+		{
+			var x = new DirectoryInfo("");
+			x.GetDirectories("");
+			x.GetFiles(SearchOption.AllDirectories, CommonSize.Huge);
+			var y = new FileInfo("");
+		}
+
 		public static void TraverseFiles_StateUnderTest_ExpectedBehavior()
 		{
 			// Arrange

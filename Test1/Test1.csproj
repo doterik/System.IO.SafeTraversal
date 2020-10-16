@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\System.IO.SafeTraversal.Core\System.IO.SafeTraversal.Core.csproj" />
+    <ProjectReference Include="..\System.IO.SafeTraversal.NET5\System.IO.SafeTraversal.NET5.csproj" />
   </ItemGroup>
 
 </Project>

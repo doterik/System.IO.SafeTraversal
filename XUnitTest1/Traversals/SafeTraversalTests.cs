@@ -25,7 +25,7 @@ namespace XUnitTest1.Traversals
 
 			// Assert
 			Assert.True(result is not null);
-			Assert.Equal(89, result.Count());
+			Assert.Equal(89, result?.Count());
 		}
 
 		[Fact]
@@ -41,7 +41,7 @@ namespace XUnitTest1.Traversals
 
 			// Assert
 			Assert.True(result is not null);
-			Assert.Equal(1251, result.Count());
+			Assert.Equal(1253, result?.Count());
 		}
 
 		[Fact]
@@ -60,7 +60,7 @@ namespace XUnitTest1.Traversals
 
 			// Assert
 			Assert.True(result is not null);
-			Assert.Equal(501, result.Count());
+			Assert.Equal(501, result?.Count());
 		}
 
 		[Fact]
@@ -78,7 +78,7 @@ namespace XUnitTest1.Traversals
 
 			// Assert
 			Assert.True(result is not null);
-			Assert.Equal(96, result.Count());
+			Assert.Equal(97, result?.Count());
 		}
 
 		[Fact]
@@ -96,7 +96,7 @@ namespace XUnitTest1.Traversals
 
 			// Assert
 			Assert.True(result is not null);
-			Assert.Equal(2, result.Count());
+			Assert.Equal(2, result?.Count());
 		}
 
 		[Fact]
@@ -114,7 +114,7 @@ namespace XUnitTest1.Traversals
 
 			// Assert
 			Assert.True(result is not null);
-			Assert.Equal(10, result.Count());
+			Assert.Equal(10, result?.Count());
 		}
 
 		[Fact]
@@ -132,7 +132,7 @@ namespace XUnitTest1.Traversals
 
 			// Assert
 			Assert.True(result is not null);
-			Assert.Equal(53, result.Count());
+			Assert.Equal(53, result?.Count());
 		}
 
 		[Fact]
@@ -150,7 +150,7 @@ namespace XUnitTest1.Traversals
 
 			// Assert
 			Assert.True(result is not null);
-			Assert.Equal(6, result.Count());
+			Assert.Equal(6, result?.Count());
 		}
 
 		[Fact]
@@ -170,7 +170,7 @@ namespace XUnitTest1.Traversals
 
 			// Assert
 			Assert.True(result is not null);
-			Assert.Equal(26, result.Count());
+			Assert.Equal(26, result?.Count());
 		}
 
 		[Fact]
@@ -188,7 +188,7 @@ namespace XUnitTest1.Traversals
 
 			// Assert
 			Assert.True(result is not null);
-			Assert.Equal(4, result.Count());
+			Assert.Equal(4, result?.Count());
 		}
 
 		[Fact]
@@ -210,7 +210,7 @@ namespace XUnitTest1.Traversals
 
 			// Assert
 			Assert.True(result is not null);
-			Assert.Equal(4, result.Count());
+			Assert.Equal(4, result?.Count());
 		}
 		#endregion
 
@@ -227,7 +227,7 @@ namespace XUnitTest1.Traversals
 
 			// Assert
 			Assert.True(result is not null);
-			Assert.Equal(18, result.Count());
+			Assert.Equal(18, result?.Count());
 		}
 
 		[Fact]
@@ -244,7 +244,7 @@ namespace XUnitTest1.Traversals
 
 			// Assert
 			Assert.True(result is not null);
-			Assert.Equal(666, result.Count());
+			Assert.Equal(666, result?.Count());
 		}
 
 		[Fact]
@@ -255,14 +255,14 @@ namespace XUnitTest1.Traversals
 			var path = new DirectoryInfo(testdir);
 			var searchOption = SearchOption.AllDirectories;
 
-			Func<DirectoryInfo, bool> filter = x => x.Parent.FullName == testdir;
+			Func<DirectoryInfo, bool> filter = x => x.Parent?.FullName == testdir;
 
 			// Act
 			var result = safeTraversal.TraverseDirectories(path, searchOption, filter);
 
 			// Assert
 			Assert.True(result is not null);
-			Assert.Equal(18, result.Count());
+			Assert.Equal(18, result?.Count());
 		}
 
 		[Fact]
@@ -280,7 +280,7 @@ namespace XUnitTest1.Traversals
 
 			// Assert
 			Assert.True(result is not null);
-			Assert.Equal(502, result.Count());
+			Assert.Equal(502, result?.Count());
 		}
 
 		[Fact]
@@ -298,7 +298,7 @@ namespace XUnitTest1.Traversals
 
 			// Assert
 			Assert.True(result is not null);
-			Assert.Equal(8, result.Count());
+			Assert.Equal(8, result?.Count());
 		}
 
 		[Fact]
@@ -316,7 +316,7 @@ namespace XUnitTest1.Traversals
 
 			// Assert
 			Assert.True(result is not null);
-			Assert.Equal(4, result.Count());
+			Assert.Equal(4, result?.Count());
 		}
 
 		[Fact]
@@ -334,7 +334,7 @@ namespace XUnitTest1.Traversals
 
 			// Assert
 			Assert.True(result is not null);
-			//Assert.Equal(1, result.Count());
+			//Assert.Equal(1, result?.Count());
 			Assert.Single(result);
 		}
 
@@ -353,7 +353,7 @@ namespace XUnitTest1.Traversals
 
 			// Assert
 			Assert.True(result is not null);
-			Assert.Equal(506, result.Count());
+			Assert.Equal(506, result?.Count());
 		}
 		#endregion
 
@@ -370,7 +370,7 @@ namespace XUnitTest1.Traversals
 
 			// Assert
 			Assert.True(result is not null);
-			Assert.Equal(89, result.Count());
+			Assert.Equal(89, result?.Count());
 		}
 
 		[Fact]
@@ -386,7 +386,7 @@ namespace XUnitTest1.Traversals
 
 			// Assert
 			Assert.True(result is not null);
-			Assert.Equal(1251, result.Count());
+			Assert.Equal(1253, result?.Count());
 		}
 
 		[Fact]
@@ -405,7 +405,7 @@ namespace XUnitTest1.Traversals
 
 			// Assert
 			Assert.True(result is not null);
-			Assert.Equal(501, result.Count());
+			Assert.Equal(501, result?.Count());
 		}
 
 		[Fact]
@@ -423,7 +423,7 @@ namespace XUnitTest1.Traversals
 
 			// Assert
 			Assert.True(result is not null);
-			Assert.Equal(96, result.Count());
+			Assert.Equal(97, result?.Count());
 		}
 
 		[Fact]
@@ -441,7 +441,7 @@ namespace XUnitTest1.Traversals
 
 			// Assert
 			Assert.True(result is not null);
-			Assert.Equal(2, result.Count());
+			Assert.Equal(2, result?.Count());
 		}
 
 		[Fact]
@@ -459,7 +459,7 @@ namespace XUnitTest1.Traversals
 
 			// Assert
 			Assert.True(result is not null);
-			Assert.Equal(10, result.Count());
+			Assert.Equal(10, result?.Count());
 		}
 
 		[Fact]
@@ -477,7 +477,7 @@ namespace XUnitTest1.Traversals
 
 			// Assert
 			Assert.True(result is not null);
-			Assert.Equal(53, result.Count());
+			Assert.Equal(53, result?.Count());
 		}
 
 		[Fact]
@@ -495,7 +495,7 @@ namespace XUnitTest1.Traversals
 
 			// Assert
 			Assert.True(result is not null);
-			Assert.Equal(6, result.Count());
+			Assert.Equal(6, result?.Count());
 		}
 
 		[Fact]
@@ -515,7 +515,7 @@ namespace XUnitTest1.Traversals
 
 			// Assert
 			Assert.True(result is not null);
-			Assert.Equal(26, result.Count());
+			Assert.Equal(26, result?.Count());
 		}
 
 		[Fact]
@@ -533,7 +533,7 @@ namespace XUnitTest1.Traversals
 
 			// Assert
 			Assert.True(result is not null);
-			Assert.Equal(4, result.Count());
+			Assert.Equal(4, result?.Count());
 		}
 
 		[Fact]
@@ -555,7 +555,7 @@ namespace XUnitTest1.Traversals
 
 			// Assert
 			Assert.True(result is not null);
-			Assert.Equal(4, result.Count());
+			Assert.Equal(4, result?.Count());
 		}
 		#endregion
 
@@ -572,7 +572,7 @@ namespace XUnitTest1.Traversals
 
 			// Assert
 			Assert.True(result is not null);
-			Assert.Equal(18, result.Count());
+			Assert.Equal(18, result?.Count());
 		}
 
 		[Fact]
@@ -589,7 +589,7 @@ namespace XUnitTest1.Traversals
 
 			// Assert
 			Assert.True(result is not null);
-			Assert.Equal(666, result.Count());
+			Assert.Equal(666, result?.Count());
 		}
 
 		[Fact]
@@ -600,14 +600,14 @@ namespace XUnitTest1.Traversals
 			var path = testdir;
 			var searchOption = SearchOption.AllDirectories;
 
-			Func<DirectoryInfo, bool> filter = x => x.Parent.FullName == testdir;
+			Func<DirectoryInfo, bool> filter = x => x.Parent?.FullName == testdir;
 
 			// Act
 			var result = safeTraversal.TraverseDirectories(path, searchOption, filter);
 
 			// Assert
 			Assert.True(result is not null);
-			Assert.Equal(18, result.Count());
+			Assert.Equal(18, result?.Count());
 		}
 
 		[Fact]
@@ -625,7 +625,7 @@ namespace XUnitTest1.Traversals
 
 			// Assert
 			Assert.True(result is not null);
-			Assert.Equal(502, result.Count());
+			Assert.Equal(502, result?.Count());
 		}
 
 		[Fact]
@@ -643,7 +643,7 @@ namespace XUnitTest1.Traversals
 
 			// Assert
 			Assert.True(result is not null);
-			Assert.Equal(8, result.Count());
+			Assert.Equal(8, result?.Count());
 		}
 
 		[Fact]
@@ -661,7 +661,7 @@ namespace XUnitTest1.Traversals
 
 			// Assert
 			Assert.True(result is not null);
-			Assert.Equal(4, result.Count());
+			Assert.Equal(4, result?.Count());
 		}
 
 		[Fact]
@@ -679,7 +679,7 @@ namespace XUnitTest1.Traversals
 
 			// Assert
 			Assert.True(result is not null);
-			//Assert.Equal(1, result.Count());
+			//Assert.Equal(1, result?.Count());
 			Assert.Single(result);
 		}
 
@@ -698,7 +698,7 @@ namespace XUnitTest1.Traversals
 
 			// Assert
 			Assert.True(result is not null);
-			Assert.Equal(506, result.Count());
+			Assert.Equal(506, result?.Count());
 		}
 		#endregion
 

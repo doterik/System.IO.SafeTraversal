@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
 
@@ -28,7 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\System.IO.SafeTraversal.Core\System.IO.SafeTraversal.Core.csproj" />
+    <ProjectReference Include="..\System.IO.SafeTraversal.NET5\System.IO.SafeTraversal.NET5.csproj" />
   </ItemGroup>
 
 </Project>
