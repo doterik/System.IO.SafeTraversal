@@ -31,7 +31,7 @@ namespace System.IO.SafeTraversal.Core
 			_ => new DateTime()
 		};
 
-		#region MatchBy
+		#region MatchBy...
 		internal static bool MatchByAttributes(FileSystemInfo fileSystemInfo, FileAttributes fileAttributes) => fileSystemInfo.Attributes.HasFlag(fileAttributes); // fileSystemInfo.Attributes & fileAttributes == fileAttributes
 
 		internal static bool MatchByCommonSize(FileInfo fileInfo, CommonSize commonSize) => commonSize switch
@@ -48,32 +48,22 @@ namespace System.IO.SafeTraversal.Core
 		internal static bool MatchByDate(FileSystemInfo fileSystemInfo, DateTime dateTime, DateComparisonType dateComparisonType)
 		{
 			var fsiDate = GetDateComparisonType(fileSystemInfo, dateComparisonType);
+
 			return DateTime.Equals(fsiDate.Date, dateTime.Date); // TODO: Precision?
-
-			//switch (fileSystemInfo)
-			//{
-			//	case FileInfo fi:
-			//		var fiDate = GetDateComparisonType(fi, dateComparisonType);
-			//		return DateTime.Equals(fiDate.Date, dateTime.Date); // TODO: Precision?
-
-			//	case DirectoryInfo di:
-			//		var diDate = GetDateComparisonType(di, dateComparisonType);
-			//		return DateTime.Equals(diDate.Date, dateTime.Date); // TODO: Precision?
-
-			//	default: return false; 
-			//};
 		}
 
 		internal static bool MatchByDateRange(FileInfo fileInfo, DateTime lowerBoundDate, DateTime upperBoundDate, DateComparisonType comparisonType)
 		{
 			var fileInfoDate = GetDateComparisonType(fileInfo, comparisonType);
+
 			return fileInfoDate >= lowerBoundDate.Date && fileInfoDate <= upperBoundDate.Date;
 		}
 
 		private static bool MatchByExtension(FileInfo fileInfo, string extension)
 		{
-			extension = Regex.Match(extension, @"(\.)?\w+").Value;
+			extension = Regex.Match(extension, @"(?:\.)?\w+$").Value; // TODO: Compiled or not !?
 			if (!extension.StartsWith(".")) extension = $".{extension}";
+
 			return fileInfo.Extension.Equals(extension, StringComparison.InvariantCultureIgnoreCase);
 		}
 
@@ -81,33 +71,16 @@ namespace System.IO.SafeTraversal.Core
 		{
 			var name = (fileSystemInfo is FileInfo && !withExtension) ? Path.GetFileNameWithoutExtension(fileSystemInfo.Name) : fileSystemInfo.Name;
 
-			var stringComparison = caseSensitive ? StringComparison.InvariantCulture : StringComparison.InvariantCultureIgnoreCase;
-
-			return name.Equals(keyword, stringComparison);
+			return name.Equals(keyword, caseSensitive ? StringComparison.InvariantCulture : StringComparison.InvariantCultureIgnoreCase);
 		}
-
-		//private static bool MatchByNameWithExtension(FileInfo fileInfo, string keyword, StringComparison stringComparison)
-		//	=> fileInfo.Name.Equals(keyword, stringComparison);
 
 		internal static bool MatchByPattern(FileSystemInfo fileSystemInfo, string pattern, bool withExtension = false)
 		{
 			var name = (fileSystemInfo is FileInfo && !withExtension) ? Path.GetFileNameWithoutExtension(fileSystemInfo.Name) : fileSystemInfo.Name;
 
-			bool result;
-			try { result = Regex.IsMatch(name, pattern/*, RegexOptions.Compiled*/); } // TODO: Compiled !?
-			catch { result = false; }
-			return result;
+			try { return Regex.IsMatch(name, pattern/*, RegexOptions.Compiled*/); } // TODO: Compiled or not !?
+			catch { return false; }
 		}
-
-		//internal static bool MatchByPattern(string fileName, string pattern, bool withExtension = false) // TODO: Check this (fileName?).
-		//{
-		//	var name = (!withExtension) ? Path.GetFileNameWithoutExtension(fileName) : fileName;
-
-		//	bool result;
-		//	try { result = Regex.IsMatch(name, pattern/*, RegexOptions.Compiled*/); } // TODO: Compiled !?
-		//	catch { result = false; }
-		//	return result;
-		//}
 
 		internal static bool MatchBySize(FileInfo fileInfo, double size, SizeType sizeType)
 		{

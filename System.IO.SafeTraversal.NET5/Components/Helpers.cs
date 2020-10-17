@@ -3,7 +3,10 @@ using System.Linq;
 
 namespace System.IO.SafeTraversal.Core
 {
-	internal static class ExtendedExtensions
+	/// <summary>
+	/// Helpers class for System.IO.SafeTraversal
+	/// </summary>
+	internal static class Helpers
 	{
 		#region Top Level Traversals
 		private static IEnumerable<FileInfo> ExTraverseFiles3(DirectoryInfo path, SearchOption searchOption, Func<FileInfo, bool>? filter = null, Action<TraversalError>? onLogError = null)

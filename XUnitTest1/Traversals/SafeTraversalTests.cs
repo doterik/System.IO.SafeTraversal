@@ -22,16 +22,16 @@ namespace XUnitTest1.Traversals
 			var searchOption = SearchOption.TopDirectoryOnly;  // Default, not used.
 
 			// Act
-			IEnumerable<FileInfo> result1 = safeTraversal.TraverseFiles(dirinfo);
-			IEnumerable<FileInfo> result2 = dirinfo.GetFiles();
-			IEnumerable<string> result3 = safeTraversal.TraverseFiles(strpath);
-			IEnumerable<string> result4 = strpath.GetFiles();
+			IEnumerable<FileInfo> infos1 = safeTraversal.TraverseFiles(dirinfo);
+			IEnumerable<FileInfo> infos2 = dirinfo.GetFiles();
+			IEnumerable<string> paths1 = safeTraversal.TraverseFiles(strpath);
+			IEnumerable<string> paths2 = strpath.GetFiles();
 
 			// Assert
-			Assert.Equal(91, result1?.Count());
-			Assert.Equal(91, result2?.Count());
-			Assert.Equal(91, result3?.Count());
-			Assert.Equal(91, result4?.Count());
+			Assert.Equal(91, infos1?.Count());
+			Assert.Equal(91, infos2?.Count());
+			Assert.Equal(91, paths1?.Count());
+			Assert.Equal(91, paths2?.Count());
 		}
 
 		[Fact]
@@ -47,16 +47,16 @@ namespace XUnitTest1.Traversals
 			static bool filter(FileInfo x) => x.IsReadOnly;
 
 			// Act
-			var result1 = safeTraversal.TraverseFiles(dirinfo, searchOption, filter);
-			var result2 = dirinfo.GetFiles(searchOption, filter);
-			var result3 = safeTraversal.TraverseFiles(strpath, searchOption, filter);
-			var result4 = strpath.GetFiles(searchOption, filter);
+			var infos1 = safeTraversal.TraverseFiles(dirinfo, searchOption, filter);
+			var infos2 = dirinfo.GetFiles(searchOption, filter);
+			var paths1 = safeTraversal.TraverseFiles(strpath, searchOption, filter);
+			var paths2 = strpath.GetFiles(searchOption, filter);
 
 			// Assert
-			Assert.Equal(2, result1?.Count());
-			Assert.Equal(2, result2?.Count());
-			Assert.Equal(2, result3?.Count());
-			Assert.Equal(2, result4?.Count());
+			Assert.Equal(2, infos1?.Count());
+			Assert.Equal(2, infos2?.Count());
+			Assert.Equal(2, paths1?.Count());
+			Assert.Equal(2, paths2?.Count());
 		}
 
 		[Fact]
@@ -71,16 +71,16 @@ namespace XUnitTest1.Traversals
 			var commonSize = CommonSize.Large;
 
 			// Act
-			var result1 = safeTraversal.TraverseFiles(dirinfo, searchOption, commonSize);
-			var result2 = dirinfo.GetFiles(searchOption, commonSize);
-			var result3 = safeTraversal.TraverseFiles(strpath, searchOption, commonSize);
-			var result4 = strpath.GetFiles(searchOption, commonSize);
+			var infos1 = safeTraversal.TraverseFiles(dirinfo, searchOption, commonSize);
+			var infos2 = dirinfo.GetFiles(searchOption, commonSize);
+			var paths1 = safeTraversal.TraverseFiles(strpath, searchOption, commonSize);
+			var paths2 = strpath.GetFiles(searchOption, commonSize);
 
 			// Assert
-			Assert.Equal(12, result1?.Count());
-			Assert.Equal(12, result2?.Count());
-			Assert.Equal(12, result3?.Count());
-			Assert.Equal(12, result4?.Count());
+			Assert.Equal(12, infos1?.Count());
+			Assert.Equal(12, infos2?.Count());
+			Assert.Equal(12, paths1?.Count());
+			Assert.Equal(12, paths2?.Count());
 		}
 
 		[Fact]
@@ -95,16 +95,71 @@ namespace XUnitTest1.Traversals
 			var searchFileByName = new SearchFileByNameOption("ngen2x32");
 
 			// Act
-			var result1 = safeTraversal.TraverseFiles(dirinfo, searchOption, searchFileByName);
-			var result2 = dirinfo.GetFiles(searchOption, searchFileByName);
-			var result3 = safeTraversal.TraverseFiles(strpath, searchOption, searchFileByName);
-			var result4 = strpath.GetFiles(searchOption, searchFileByName);
+			var infos1 = safeTraversal.TraverseFiles(dirinfo, searchOption, searchFileByName);
+			var infos2 = dirinfo.GetFiles(searchOption, searchFileByName);
+			var paths1 = safeTraversal.TraverseFiles(strpath, searchOption, searchFileByName);
+			var paths2 = strpath.GetFiles(searchOption, searchFileByName);
 
 			// Assert
-			Assert.Equal(1, result1?.Count());
-			Assert.Equal(1, result2?.Count());
-			Assert.Equal(1, result3?.Count());
-			Assert.Equal(1, result4?.Count());
+			Assert.Equal(1, infos1?.Count());
+			Assert.Equal(1, infos2?.Count());
+			Assert.Equal(1, paths1?.Count());
+			Assert.Equal(1, paths2?.Count());
+		}
+
+		[Theory]
+		[InlineData("ngen4x32.txt", true, 1)]
+		[InlineData("ngen4x32.txt", false, 0)]
+		[InlineData("ngen4x32", true, 0)]
+		[InlineData("ngen4x32", false, 1)]
+		public void TraverseFiles_TopDirectories_SearchFileByNameOption_IncludeExtension(string name, bool includeExtension, int expected)
+		{
+			// Arrange
+			var safeTraversal = new SafeTraversal();
+			var dirinfo = new DirectoryInfo(testdir);
+			var strpath = testdir;
+			var searchOption = SearchOption.TopDirectoryOnly;
+
+			var searchFileByName = new SearchFileByNameOption(name, includeExtension);
+
+			// Act
+			var infos1 = safeTraversal.TraverseFiles(dirinfo, searchOption, searchFileByName);
+			var infos2 = dirinfo.GetFiles(searchOption, searchFileByName);
+			var paths1 = safeTraversal.TraverseFiles(strpath, searchOption, searchFileByName);
+			var paths2 = strpath.GetFiles(searchOption, searchFileByName);
+
+			// Assert
+			Assert.Equal(expected, infos1?.Count());
+			Assert.Equal(expected, infos2?.Count());
+			Assert.Equal(expected, paths1?.Count());
+			Assert.Equal(expected, paths2?.Count());
+		}
+
+		[Theory]
+		[InlineData("Thumbs", true, 1)]
+		[InlineData("thumbs", true, 0)]
+		[InlineData("thumbs", false, 1)]
+		public void TraverseFiles_TopDirectories_SearchFileByNameOption_CaseSensitive(string name, bool caseSensitive, int expected)
+		{
+			// Arrange
+			var safeTraversal = new SafeTraversal();
+			var dirinfo = new DirectoryInfo(testdir);
+			var strpath = testdir;
+			var searchOption = SearchOption.TopDirectoryOnly;
+
+			var searchFileByName = new SearchFileByNameOption(name, caseSensitive: caseSensitive); // Argument name is a must here (not in position)!
+
+			// Act
+			var infos1 = safeTraversal.TraverseFiles(dirinfo, searchOption, searchFileByName);
+			var infos2 = dirinfo.GetFiles(searchOption, searchFileByName);
+			var paths1 = safeTraversal.TraverseFiles(strpath, searchOption, searchFileByName);
+			var paths2 = strpath.GetFiles(searchOption, searchFileByName);
+
+			// Assert
+			Assert.Equal(expected, infos1?.Count());
+			Assert.Equal(expected, infos2?.Count());
+			Assert.Equal(expected, paths1?.Count());
+			Assert.Equal(expected, paths2?.Count());
 		}
 
 		[Fact]
@@ -119,16 +174,16 @@ namespace XUnitTest1.Traversals
 			var searchFileBySize = new SearchFileBySizeOption(2, SizeType.MegaBytes);
 
 			// Act
-			var result1 = safeTraversal.TraverseFiles(dirinfo, searchOption, searchFileBySize);
-			var result2 = dirinfo.GetFiles(searchOption, searchFileBySize);
-			var result3 = safeTraversal.TraverseFiles(strpath, searchOption, searchFileBySize);
-			var result4 = strpath.GetFiles(searchOption, searchFileBySize);
+			var infos1 = safeTraversal.TraverseFiles(dirinfo, searchOption, searchFileBySize);
+			var infos2 = dirinfo.GetFiles(searchOption, searchFileBySize);
+			var paths1 = safeTraversal.TraverseFiles(strpath, searchOption, searchFileBySize);
+			var paths2 = strpath.GetFiles(searchOption, searchFileBySize);
 
 			// Assert
-			Assert.Equal(3, result1?.Count());
-			Assert.Equal(3, result2?.Count());
-			Assert.Equal(3, result3?.Count());
-			Assert.Equal(3, result4?.Count());
+			Assert.Equal(3, infos1?.Count());
+			Assert.Equal(3, infos2?.Count());
+			Assert.Equal(3, paths1?.Count());
+			Assert.Equal(3, paths2?.Count());
 		}
 
 		[Fact]
@@ -143,16 +198,16 @@ namespace XUnitTest1.Traversals
 			var searchFileBySizeRange = new SearchFileBySizeRangeOption(4, 10, SizeType.MegaBytes);
 
 			// Act
-			var result1 = safeTraversal.TraverseFiles(dirinfo, searchOption, searchFileBySizeRange);
-			var result2 = dirinfo.GetFiles(searchOption, searchFileBySizeRange);
-			var result3 = safeTraversal.TraverseFiles(strpath, searchOption, searchFileBySizeRange);
-			var result4 = strpath.GetFiles(searchOption, searchFileBySizeRange);
+			var infos1 = safeTraversal.TraverseFiles(dirinfo, searchOption, searchFileBySizeRange);
+			var infos2 = dirinfo.GetFiles(searchOption, searchFileBySizeRange);
+			var paths1 = safeTraversal.TraverseFiles(strpath, searchOption, searchFileBySizeRange);
+			var paths2 = strpath.GetFiles(searchOption, searchFileBySizeRange);
 
 			// Assert
-			Assert.Equal(5, result1?.Count());
-			Assert.Equal(5, result2?.Count());
-			Assert.Equal(5, result3?.Count());
-			Assert.Equal(5, result4?.Count());
+			Assert.Equal(5, infos1?.Count());
+			Assert.Equal(5, infos2?.Count());
+			Assert.Equal(5, paths1?.Count());
+			Assert.Equal(5, paths2?.Count());
 		}
 
 		[Fact]
@@ -167,16 +222,16 @@ namespace XUnitTest1.Traversals
 			var searchFileByDate = new SearchFileByDateOption(new DateTime(2016, 01, 15), DateComparisonType.CreationDate);
 
 			// Act
-			var result1 = safeTraversal.TraverseFiles(dirinfo, searchOption, searchFileByDate);
-			var result2 = dirinfo.GetFiles(searchOption, searchFileByDate);
-			var result3 = safeTraversal.TraverseFiles(strpath, searchOption, searchFileByDate);
-			var result4 = strpath.GetFiles(searchOption, searchFileByDate);
+			var infos1 = safeTraversal.TraverseFiles(dirinfo, searchOption, searchFileByDate);
+			var infos2 = dirinfo.GetFiles(searchOption, searchFileByDate);
+			var paths1 = safeTraversal.TraverseFiles(strpath, searchOption, searchFileByDate);
+			var paths2 = strpath.GetFiles(searchOption, searchFileByDate);
 
 			// Assert
-			Assert.Equal(4, result1?.Count());
-			Assert.Equal(4, result2?.Count());
-			Assert.Equal(4, result3?.Count());
-			Assert.Equal(4, result4?.Count());
+			Assert.Equal(4, infos1?.Count());
+			Assert.Equal(4, infos2?.Count());
+			Assert.Equal(4, paths1?.Count());
+			Assert.Equal(4, paths2?.Count());
 		}
 
 		[Fact]
@@ -193,16 +248,16 @@ namespace XUnitTest1.Traversals
 				new DateTime(2016, 03, 31), DateComparisonType.CreationDate);
 
 			// Act
-			var result1 = safeTraversal.TraverseFiles(dirinfo, searchOption, searchFileByDateRange);
-			var result2 = dirinfo.GetFiles(searchOption, searchFileByDateRange);
-			var result3 = safeTraversal.TraverseFiles(strpath, searchOption, searchFileByDateRange);
-			var result4 = strpath.GetFiles(searchOption, searchFileByDateRange);
+			var infos1 = safeTraversal.TraverseFiles(dirinfo, searchOption, searchFileByDateRange);
+			var infos2 = dirinfo.GetFiles(searchOption, searchFileByDateRange);
+			var paths1 = safeTraversal.TraverseFiles(strpath, searchOption, searchFileByDateRange);
+			var paths2 = strpath.GetFiles(searchOption, searchFileByDateRange);
 
 			// Assert
-			Assert.Equal(10, result1?.Count());
-			Assert.Equal(10, result2?.Count());
-			Assert.Equal(10, result3?.Count());
-			Assert.Equal(10, result4?.Count());
+			Assert.Equal(10, infos1?.Count());
+			Assert.Equal(10, infos2?.Count());
+			Assert.Equal(10, paths1?.Count());
+			Assert.Equal(10, paths2?.Count());
 		}
 
 		[Fact]
@@ -217,20 +272,23 @@ namespace XUnitTest1.Traversals
 			var searchFileByRegularExpressionPattern = new SearchFileByRegularExpressionOption(@"^ng.*x6");
 
 			// Act
-			var result1 = safeTraversal.TraverseFiles(dirinfo, searchOption, searchFileByRegularExpressionPattern);
-			var result2 = dirinfo.GetFiles(searchOption, searchFileByRegularExpressionPattern);
-			var result3 = safeTraversal.TraverseFiles(strpath, searchOption, searchFileByRegularExpressionPattern);
-			var result4 = strpath.GetFiles(searchOption, searchFileByRegularExpressionPattern);
+			var infos1 = safeTraversal.TraverseFiles(dirinfo, searchOption, searchFileByRegularExpressionPattern);
+			var infos2 = dirinfo.GetFiles(searchOption, searchFileByRegularExpressionPattern);
+			var paths1 = safeTraversal.TraverseFiles(strpath, searchOption, searchFileByRegularExpressionPattern);
+			var paths2 = strpath.GetFiles(searchOption, searchFileByRegularExpressionPattern);
 
 			// Assert
-			Assert.Equal(2, result1?.Count());
-			Assert.Equal(2, result2?.Count());
-			Assert.Equal(2, result3?.Count());
-			Assert.Equal(2, result4?.Count());
+			Assert.Equal(2, infos1?.Count());
+			Assert.Equal(2, infos2?.Count());
+			Assert.Equal(2, paths1?.Count());
+			Assert.Equal(2, paths2?.Count());
 		}
 
-		[Fact]
-		public void TraverseFiles_TopDirectories_SafeTraversalFileSearchOptions()
+		[Theory]
+		[InlineData("csv", 4)]
+		[InlineData(".csv", 4)]
+		[InlineData(".xls.csv", 4)]
+		public void TraverseFiles_TopDirectories_SafeTraversalFileSearchOptions(string extension, int expected)
 		{
 			// Arrange
 			var safeTraversal = new SafeTraversal();
@@ -240,21 +298,21 @@ namespace XUnitTest1.Traversals
 
 			var fileSearchOptions = new SafeTraversalFileSearchOptions
 			{
-				Extension = "csv",
+				Extension = extension,
 				SizeOption = new SearchFileBySizeOption(21, SizeType.KiloBytes)
 			};
 
 			// Act
-			var result1 = safeTraversal.TraverseFiles(dirinfo, searchOption, fileSearchOptions);
-			var result2 = dirinfo.GetFiles(searchOption, fileSearchOptions);
-			var result3 = safeTraversal.TraverseFiles(strpath, searchOption, fileSearchOptions);
-			var result4 = strpath.GetFiles(searchOption, fileSearchOptions);
+			var infos1 = safeTraversal.TraverseFiles(dirinfo, searchOption, fileSearchOptions);
+			var infos2 = dirinfo.GetFiles(searchOption, fileSearchOptions);
+			var paths1 = safeTraversal.TraverseFiles(strpath, searchOption, fileSearchOptions);
+			var paths2 = strpath.GetFiles(searchOption, fileSearchOptions);
 
 			// Assert
-			Assert.Equal(4, result1?.Count());
-			Assert.Equal(4, result2?.Count());
-			Assert.Equal(4, result3?.Count());
-			Assert.Equal(4, result4?.Count());
+			Assert.Equal(expected, infos1?.Count());
+			Assert.Equal(expected, infos2?.Count());
+			Assert.Equal(expected, paths1?.Count());
+			Assert.Equal(expected, paths2?.Count());
 		}
 		#endregion
 
@@ -269,16 +327,16 @@ namespace XUnitTest1.Traversals
 			var searchOption = SearchOption.AllDirectories;
 
 			// Act
-			IEnumerable<FileInfo> result1 = safeTraversal.TraverseFiles(dirinfo, searchOption);
-			IEnumerable<FileInfo> result2 = dirinfo.GetFiles(searchOption);
-			IEnumerable<string> result3 = safeTraversal.TraverseFiles(strpath, searchOption);
-			IEnumerable<string> result4 = strpath.GetFiles(searchOption);
+			IEnumerable<FileInfo> infos1 = safeTraversal.TraverseFiles(dirinfo, searchOption);
+			IEnumerable<FileInfo> infos2 = dirinfo.GetFiles(searchOption);
+			IEnumerable<string> paths1 = safeTraversal.TraverseFiles(strpath, searchOption);
+			IEnumerable<string> paths2 = strpath.GetFiles(searchOption);
 
 			// Assert
-			Assert.Equal(1255, result1?.Count());
-			Assert.Equal(1255, result2?.Count());
-			Assert.Equal(1255, result3?.Count());
-			Assert.Equal(1255, result4?.Count());
+			Assert.Equal(1255, infos1?.Count());
+			Assert.Equal(1255, infos2?.Count());
+			Assert.Equal(1255, paths1?.Count());
+			Assert.Equal(1255, paths2?.Count());
 		}
 
 		[Fact]
@@ -294,16 +352,16 @@ namespace XUnitTest1.Traversals
 			static bool filter(FileInfo x) => x.IsReadOnly;
 
 			// Act
-			var result1 = safeTraversal.TraverseFiles(dirinfo, searchOption, filter);
-			var result2 = dirinfo.GetFiles(searchOption, filter);
-			var result3 = safeTraversal.TraverseFiles(strpath, searchOption, filter);
-			var result4 = strpath.GetFiles(searchOption, filter);
+			var infos1 = safeTraversal.TraverseFiles(dirinfo, searchOption, filter);
+			var infos2 = dirinfo.GetFiles(searchOption, filter);
+			var paths1 = safeTraversal.TraverseFiles(strpath, searchOption, filter);
+			var paths2 = strpath.GetFiles(searchOption, filter);
 
 			// Assert
-			Assert.Equal(503, result1?.Count());
-			Assert.Equal(503, result2?.Count());
-			Assert.Equal(503, result3?.Count());
-			Assert.Equal(503, result4?.Count());
+			Assert.Equal(503, infos1?.Count());
+			Assert.Equal(503, infos2?.Count());
+			Assert.Equal(503, paths1?.Count());
+			Assert.Equal(503, paths2?.Count());
 		}
 
 		[Fact]
@@ -318,16 +376,16 @@ namespace XUnitTest1.Traversals
 			var commonSize = CommonSize.Large;
 
 			// Act
-			var result1 = safeTraversal.TraverseFiles(dirinfo, searchOption, commonSize);
-			var result2 = dirinfo.GetFiles(searchOption, commonSize);
-			var result3 = safeTraversal.TraverseFiles(strpath, searchOption, commonSize);
-			var result4 = strpath.GetFiles(searchOption, commonSize);
+			var infos1 = safeTraversal.TraverseFiles(dirinfo, searchOption, commonSize);
+			var infos2 = dirinfo.GetFiles(searchOption, commonSize);
+			var paths1 = safeTraversal.TraverseFiles(strpath, searchOption, commonSize);
+			var paths2 = strpath.GetFiles(searchOption, commonSize);
 
 			// Assert
-			Assert.Equal(97, result1?.Count());
-			Assert.Equal(97, result2?.Count());
-			Assert.Equal(97, result3?.Count());
-			Assert.Equal(97, result4?.Count());
+			Assert.Equal(97, infos1?.Count());
+			Assert.Equal(97, infos2?.Count());
+			Assert.Equal(97, paths1?.Count());
+			Assert.Equal(97, paths2?.Count());
 		}
 
 		[Fact]
@@ -342,16 +400,68 @@ namespace XUnitTest1.Traversals
 			var searchFileByName = new SearchFileByNameOption("ngen2x32");
 
 			// Act
-			var result1 = safeTraversal.TraverseFiles(dirinfo, searchOption, searchFileByName);
-			var result2 = dirinfo.GetFiles(searchOption, searchFileByName);
-			var result3 = safeTraversal.TraverseFiles(strpath, searchOption, searchFileByName);
-			var result4 = strpath.GetFiles(searchOption, searchFileByName);
+			var infos1 = safeTraversal.TraverseFiles(dirinfo, searchOption, searchFileByName);
+			var infos2 = dirinfo.GetFiles(searchOption, searchFileByName);
+			var paths1 = safeTraversal.TraverseFiles(strpath, searchOption, searchFileByName);
+			var paths2 = strpath.GetFiles(searchOption, searchFileByName);
 
 			// Assert
-			Assert.Equal(2, result1?.Count());
-			Assert.Equal(2, result2?.Count());
-			Assert.Equal(2, result3?.Count());
-			Assert.Equal(2, result4?.Count());
+			Assert.Equal(2, infos1?.Count());
+			Assert.Equal(2, infos2?.Count());
+			Assert.Equal(2, paths1?.Count());
+			Assert.Equal(2, paths2?.Count());
+		}
+
+		[Theory]
+		[InlineData("ngen4x32.txt", true, 2)]
+		[InlineData("ngen4x32.txt", false, 0)]
+		[InlineData("ngen4x32", true, 0)]
+		[InlineData("ngen4x32", false, 2)]
+		public void TraverseFiles_AllDirectories_SearchFileByNameOption_IncludeExtension(string name, bool includeExtension, int expected)
+		{
+			// Arrange
+			var safeTraversal = new SafeTraversal();
+			var dirinfo = new DirectoryInfo(testdir);
+			var strpath = testdir;
+			var searchOption = SearchOption.AllDirectories;
+
+			var searchFileByName = new SearchFileByNameOption(name, includeExtension);
+
+			// Act
+			var infos1 = safeTraversal.TraverseFiles(dirinfo, searchOption, searchFileByName);
+			var infos2 = dirinfo.GetFiles(searchOption, searchFileByName);
+			var paths1 = safeTraversal.TraverseFiles(strpath, searchOption, searchFileByName);
+			var paths2 = strpath.GetFiles(searchOption, searchFileByName);
+
+			// Assert
+			Assert.Equal(expected, infos1?.Count());
+			Assert.Equal(expected, infos2?.Count());
+			Assert.Equal(expected, paths1?.Count());
+			Assert.Equal(expected, paths2?.Count());
+		}
+
+		[Fact]
+		public void TraverseFiles_AllDirectories_SearchFileByNameOption_CaseSensitive()
+		{
+			// Arrange
+			var safeTraversal = new SafeTraversal();
+			var dirinfo = new DirectoryInfo(testdir);
+			var strpath = testdir;
+			var searchOption = SearchOption.AllDirectories;
+
+			var searchFileByName = new SearchFileByNameOption("Settings", caseSensitive: true);
+
+			// Act
+			var infos1 = safeTraversal.TraverseFiles(dirinfo, searchOption, searchFileByName);
+			var infos2 = dirinfo.GetFiles(searchOption, searchFileByName);
+			var paths1 = safeTraversal.TraverseFiles(strpath, searchOption, searchFileByName);
+			var paths2 = strpath.GetFiles(searchOption, searchFileByName);
+
+			// Assert
+			Assert.Equal(14, infos1?.Count());
+			Assert.Equal(14, infos2?.Count());
+			Assert.Equal(14, paths1?.Count());
+			Assert.Equal(14, paths2?.Count());
 		}
 
 		[Fact]
@@ -366,16 +476,16 @@ namespace XUnitTest1.Traversals
 			var searchFileBySize = new SearchFileBySizeOption(2, SizeType.MegaBytes);
 
 			// Act
-			var result1 = safeTraversal.TraverseFiles(dirinfo, searchOption, searchFileBySize);
-			var result2 = dirinfo.GetFiles(searchOption, searchFileBySize);
-			var result3 = safeTraversal.TraverseFiles(strpath, searchOption, searchFileBySize);
-			var result4 = strpath.GetFiles(searchOption, searchFileBySize);
+			var infos1 = safeTraversal.TraverseFiles(dirinfo, searchOption, searchFileBySize);
+			var infos2 = dirinfo.GetFiles(searchOption, searchFileBySize);
+			var paths1 = safeTraversal.TraverseFiles(strpath, searchOption, searchFileBySize);
+			var paths2 = strpath.GetFiles(searchOption, searchFileBySize);
 
 			// Assert
-			Assert.Equal(10, result1?.Count());
-			Assert.Equal(10, result2?.Count());
-			Assert.Equal(10, result3?.Count());
-			Assert.Equal(10, result4?.Count());
+			Assert.Equal(10, infos1?.Count());
+			Assert.Equal(10, infos2?.Count());
+			Assert.Equal(10, paths1?.Count());
+			Assert.Equal(10, paths2?.Count());
 		}
 
 		[Fact]
@@ -390,16 +500,16 @@ namespace XUnitTest1.Traversals
 			var searchFileBySizeRange = new SearchFileBySizeRangeOption(4, 10, SizeType.MegaBytes);
 
 			// Act
-			var result1 = safeTraversal.TraverseFiles(dirinfo, searchOption, searchFileBySizeRange);
-			var result2 = dirinfo.GetFiles(searchOption, searchFileBySizeRange);
-			var result3 = safeTraversal.TraverseFiles(strpath, searchOption, searchFileBySizeRange);
-			var result4 = strpath.GetFiles(searchOption, searchFileBySizeRange);
+			var infos1 = safeTraversal.TraverseFiles(dirinfo, searchOption, searchFileBySizeRange);
+			var infos2 = dirinfo.GetFiles(searchOption, searchFileBySizeRange);
+			var paths1 = safeTraversal.TraverseFiles(strpath, searchOption, searchFileBySizeRange);
+			var paths2 = strpath.GetFiles(searchOption, searchFileBySizeRange);
 
 			// Assert
-			Assert.Equal(53, result1?.Count());
-			Assert.Equal(53, result2?.Count());
-			Assert.Equal(53, result3?.Count());
-			Assert.Equal(53, result4?.Count());
+			Assert.Equal(53, infos1?.Count());
+			Assert.Equal(53, infos2?.Count());
+			Assert.Equal(53, paths1?.Count());
+			Assert.Equal(53, paths2?.Count());
 		}
 
 		[Fact]
@@ -414,16 +524,16 @@ namespace XUnitTest1.Traversals
 			var searchFileByDate = new SearchFileByDateOption(new DateTime(2017, 09, 01), DateComparisonType.CreationDate);
 
 			// Act
-			var result1 = safeTraversal.TraverseFiles(dirinfo, searchOption, searchFileByDate);
-			var result2 = dirinfo.GetFiles(searchOption, searchFileByDate);
-			var result3 = safeTraversal.TraverseFiles(strpath, searchOption, searchFileByDate);
-			var result4 = strpath.GetFiles(searchOption, searchFileByDate);
+			var infos1 = safeTraversal.TraverseFiles(dirinfo, searchOption, searchFileByDate);
+			var infos2 = dirinfo.GetFiles(searchOption, searchFileByDate);
+			var paths1 = safeTraversal.TraverseFiles(strpath, searchOption, searchFileByDate);
+			var paths2 = strpath.GetFiles(searchOption, searchFileByDate);
 
 			// Assert
-			Assert.Equal(6, result1?.Count());
-			Assert.Equal(6, result2?.Count());
-			Assert.Equal(6, result3?.Count());
-			Assert.Equal(6, result4?.Count());
+			Assert.Equal(6, infos1?.Count());
+			Assert.Equal(6, infos2?.Count());
+			Assert.Equal(6, paths1?.Count());
+			Assert.Equal(6, paths2?.Count());
 		}
 
 		[Fact]
@@ -440,16 +550,16 @@ namespace XUnitTest1.Traversals
 				new DateTime(2017, 09, 30), DateComparisonType.CreationDate);
 
 			// Act
-			var result1 = safeTraversal.TraverseFiles(dirinfo, searchOption, searchFileByDateRange);
-			var result2 = dirinfo.GetFiles(searchOption, searchFileByDateRange);
-			var result3 = safeTraversal.TraverseFiles(strpath, searchOption, searchFileByDateRange);
-			var result4 = strpath.GetFiles(searchOption, searchFileByDateRange);
+			var infos1 = safeTraversal.TraverseFiles(dirinfo, searchOption, searchFileByDateRange);
+			var infos2 = dirinfo.GetFiles(searchOption, searchFileByDateRange);
+			var paths1 = safeTraversal.TraverseFiles(strpath, searchOption, searchFileByDateRange);
+			var paths2 = strpath.GetFiles(searchOption, searchFileByDateRange);
 
 			// Assert
-			Assert.Equal(26, result1?.Count());
-			Assert.Equal(26, result2?.Count());
-			Assert.Equal(26, result3?.Count());
-			Assert.Equal(26, result4?.Count());
+			Assert.Equal(26, infos1?.Count());
+			Assert.Equal(26, infos2?.Count());
+			Assert.Equal(26, paths1?.Count());
+			Assert.Equal(26, paths2?.Count());
 		}
 
 		[Fact]
@@ -464,16 +574,16 @@ namespace XUnitTest1.Traversals
 			var searchFileByRegularExpressionPattern = new SearchFileByRegularExpressionOption(@"^ng.*x6");
 
 			// Act
-			var result1 = safeTraversal.TraverseFiles(dirinfo, searchOption, searchFileByRegularExpressionPattern);
-			var result2 = dirinfo.GetFiles(searchOption, searchFileByRegularExpressionPattern);
-			var result3 = safeTraversal.TraverseFiles(strpath, searchOption, searchFileByRegularExpressionPattern);
-			var result4 = strpath.GetFiles(searchOption, searchFileByRegularExpressionPattern);
+			var infos1 = safeTraversal.TraverseFiles(dirinfo, searchOption, searchFileByRegularExpressionPattern);
+			var infos2 = dirinfo.GetFiles(searchOption, searchFileByRegularExpressionPattern);
+			var paths1 = safeTraversal.TraverseFiles(strpath, searchOption, searchFileByRegularExpressionPattern);
+			var paths2 = strpath.GetFiles(searchOption, searchFileByRegularExpressionPattern);
 
 			// Assert
-			Assert.Equal(4, result1?.Count());
-			Assert.Equal(4, result2?.Count());
-			Assert.Equal(4, result3?.Count());
-			Assert.Equal(4, result4?.Count());
+			Assert.Equal(4, infos1?.Count());
+			Assert.Equal(4, infos2?.Count());
+			Assert.Equal(4, paths1?.Count());
+			Assert.Equal(4, paths2?.Count());
 		}
 
 		[Fact]
@@ -492,16 +602,16 @@ namespace XUnitTest1.Traversals
 			};
 
 			// Act
-			var result1 = safeTraversal.TraverseFiles(dirinfo, searchOption, fileSearchOptions);
-			var result2 = dirinfo.GetFiles(searchOption, fileSearchOptions);
-			var result3 = safeTraversal.TraverseFiles(strpath, searchOption, fileSearchOptions);
-			var result4 = strpath.GetFiles(searchOption, fileSearchOptions);
+			var infos1 = safeTraversal.TraverseFiles(dirinfo, searchOption, fileSearchOptions);
+			var infos2 = dirinfo.GetFiles(searchOption, fileSearchOptions);
+			var paths1 = safeTraversal.TraverseFiles(strpath, searchOption, fileSearchOptions);
+			var paths2 = strpath.GetFiles(searchOption, fileSearchOptions);
 
 			// Assert
-			Assert.Equal(4, result1?.Count());
-			Assert.Equal(4, result2?.Count());
-			Assert.Equal(4, result3?.Count());
-			Assert.Equal(4, result4?.Count());
+			Assert.Equal(4, infos1?.Count());
+			Assert.Equal(4, infos2?.Count());
+			Assert.Equal(4, paths1?.Count());
+			Assert.Equal(4, paths2?.Count());
 		}
 		#endregion
 
@@ -516,16 +626,16 @@ namespace XUnitTest1.Traversals
 			var searchOption = SearchOption.TopDirectoryOnly;  // Default, not used.
 
 			// Act
-			IEnumerable<DirectoryInfo> result1 = safeTraversal.TraverseDirectories(dirinfo);
-			IEnumerable<DirectoryInfo> result2 = dirinfo.GetDirectories();
-			IEnumerable<string> result3 = safeTraversal.TraverseDirectories(strpath);
-			IEnumerable<string> result4 = strpath.GetDirectories();
+			IEnumerable<DirectoryInfo> infos1 = safeTraversal.TraverseDirectories(dirinfo);
+			IEnumerable<DirectoryInfo> infos2 = dirinfo.GetDirectories();
+			IEnumerable<string> paths1 = safeTraversal.TraverseDirectories(strpath);
+			IEnumerable<string> paths2 = strpath.GetDirectories();
 
 			// Assert
-			Assert.Equal(19, result1?.Count());
-			Assert.Equal(19, result2?.Count());
-			Assert.Equal(19, result3?.Count());
-			Assert.Equal(19, result4?.Count());
+			Assert.Equal(19, infos1?.Count());
+			Assert.Equal(19, infos2?.Count());
+			Assert.Equal(19, paths1?.Count());
+			Assert.Equal(19, paths2?.Count());
 		}
 
 		[Fact]
@@ -540,16 +650,16 @@ namespace XUnitTest1.Traversals
 			Func<DirectoryInfo, bool> filter = x => x.Attributes.HasFlag(FileAttributes.ReadOnly);
 
 			// Act
-			var result1 = safeTraversal.TraverseDirectories(dirinfo, searchOption, filter);
-			var result2 = dirinfo.GetDirectories(searchOption, filter);
-			var result3 = safeTraversal.TraverseDirectories(strpath, searchOption, filter);
-			var result4 = strpath.GetDirectories(searchOption, filter);
+			var infos1 = safeTraversal.TraverseDirectories(dirinfo, searchOption, filter);
+			var infos2 = dirinfo.GetDirectories(searchOption, filter);
+			var paths1 = safeTraversal.TraverseDirectories(strpath, searchOption, filter);
+			var paths2 = strpath.GetDirectories(searchOption, filter);
 
 			// Assert
-			Assert.Equal(1, result1?.Count());
-			Assert.Equal(1, result2?.Count());
-			Assert.Equal(1, result3?.Count());
-			Assert.Equal(1, result4?.Count());
+			Assert.Equal(1, infos1?.Count());
+			Assert.Equal(1, infos2?.Count());
+			Assert.Equal(1, paths1?.Count());
+			Assert.Equal(1, paths2?.Count());
 		}
 
 		[Fact]
@@ -564,16 +674,16 @@ namespace XUnitTest1.Traversals
 			var attributes = FileAttributes.ReadOnly; // FileAttributes.Directory;
 
 			// Act
-			var result1 = safeTraversal.TraverseDirectories(dirinfo, searchOption, attributes);
-			var result2 = dirinfo.GetDirectories(searchOption, attributes);
-			var result3 = safeTraversal.TraverseDirectories(strpath, searchOption, attributes);
-			var result4 = strpath.GetDirectories(searchOption, attributes);
+			var infos1 = safeTraversal.TraverseDirectories(dirinfo, searchOption, attributes);
+			var infos2 = dirinfo.GetDirectories(searchOption, attributes);
+			var paths1 = safeTraversal.TraverseDirectories(strpath, searchOption, attributes);
+			var paths2 = strpath.GetDirectories(searchOption, attributes);
 
 			// Assert
-			Assert.Equal(1, result1?.Count());
-			Assert.Equal(1, result2?.Count());
-			Assert.Equal(1, result3?.Count());
-			Assert.Equal(1, result4?.Count());
+			Assert.Equal(1, infos1?.Count());
+			Assert.Equal(1, infos2?.Count());
+			Assert.Equal(1, paths1?.Count());
+			Assert.Equal(1, paths2?.Count());
 		}
 
 		[Fact]
@@ -588,16 +698,16 @@ namespace XUnitTest1.Traversals
 			var searchDirectoryByDateOption = new SearchDirectoryByDateOption(new DateTime(2019, 05, 18), DateComparisonType.LastModificationDate);
 
 			// Act
-			var result1 = safeTraversal.TraverseDirectories(dirinfo, searchOption, searchDirectoryByDateOption);
-			var result2 = dirinfo.GetDirectories(searchOption, searchDirectoryByDateOption);
-			var result3 = safeTraversal.TraverseDirectories(strpath, searchOption, searchDirectoryByDateOption);
-			var result4 = strpath.GetDirectories(searchOption, searchDirectoryByDateOption);
+			var infos1 = safeTraversal.TraverseDirectories(dirinfo, searchOption, searchDirectoryByDateOption);
+			var infos2 = dirinfo.GetDirectories(searchOption, searchDirectoryByDateOption);
+			var paths1 = safeTraversal.TraverseDirectories(strpath, searchOption, searchDirectoryByDateOption);
+			var paths2 = strpath.GetDirectories(searchOption, searchDirectoryByDateOption);
 
 			// Assert
-			Assert.Equal(2, result1?.Count());
-			Assert.Equal(2, result2?.Count());
-			Assert.Equal(2, result3?.Count());
-			Assert.Equal(2, result4?.Count());
+			Assert.Equal(2, infos1?.Count());
+			Assert.Equal(2, infos2?.Count());
+			Assert.Equal(2, paths1?.Count());
+			Assert.Equal(2, paths2?.Count());
 		}
 
 		[Fact]
@@ -612,16 +722,16 @@ namespace XUnitTest1.Traversals
 			var searchDirectoryByName = new SearchDirectoryByNameOption("e0");
 
 			// Act
-			var result1 = safeTraversal.TraverseDirectories(dirinfo, searchOption, searchDirectoryByName);
-			var result2 = dirinfo.GetDirectories(searchOption, searchDirectoryByName);
-			var result3 = safeTraversal.TraverseDirectories(strpath, searchOption, searchDirectoryByName);
-			var result4 = strpath.GetDirectories(searchOption, searchDirectoryByName);
+			var infos1 = safeTraversal.TraverseDirectories(dirinfo, searchOption, searchDirectoryByName);
+			var infos2 = dirinfo.GetDirectories(searchOption, searchDirectoryByName);
+			var paths1 = safeTraversal.TraverseDirectories(strpath, searchOption, searchDirectoryByName);
+			var paths2 = strpath.GetDirectories(searchOption, searchDirectoryByName);
 
 			// Assert
-			Assert.Equal(1, result1?.Count());
-			Assert.Equal(1, result2?.Count());
-			Assert.Equal(1, result3?.Count());
-			Assert.Equal(1, result4?.Count());
+			Assert.Equal(1, infos1?.Count());
+			Assert.Equal(1, infos2?.Count());
+			Assert.Equal(1, paths1?.Count());
+			Assert.Equal(1, paths2?.Count());
 		}
 
 		[Fact]
@@ -636,20 +746,20 @@ namespace XUnitTest1.Traversals
 			var searchDirectoryByRegularExpressionPattern = new SearchDirectoryByRegularExpressionOption(@"Diag$");
 
 			// Act
-			var result1 = safeTraversal.TraverseDirectories(dirinfo, searchOption, searchDirectoryByRegularExpressionPattern);
-			var result2 = dirinfo.GetDirectories(searchOption, searchDirectoryByRegularExpressionPattern);
-			var result3 = safeTraversal.TraverseDirectories(strpath, searchOption, searchDirectoryByRegularExpressionPattern);
-			var result4 = strpath.GetDirectories(searchOption, searchDirectoryByRegularExpressionPattern);
+			var infos1 = safeTraversal.TraverseDirectories(dirinfo, searchOption, searchDirectoryByRegularExpressionPattern);
+			var infos2 = dirinfo.GetDirectories(searchOption, searchDirectoryByRegularExpressionPattern);
+			var paths1 = safeTraversal.TraverseDirectories(strpath, searchOption, searchDirectoryByRegularExpressionPattern);
+			var paths2 = strpath.GetDirectories(searchOption, searchDirectoryByRegularExpressionPattern);
 
 			// Assert
-			//Assert.Equal(1, result1?.Count());
-			//Assert.Equal(1, result2?.Count());
-			//Assert.Equal(1, result3?.Count());
-			//Assert.Equal(1, result4?.Count());
-			Assert.Single(result1);
-			Assert.Single(result2);
-			Assert.Single(result3);
-			Assert.Single(result4);
+			//Assert.Equal(1, infos1?.Count());
+			//Assert.Equal(1, infos2?.Count());
+			//Assert.Equal(1, paths1?.Count());
+			//Assert.Equal(1, paths2?.Count());
+			Assert.Single(infos1);
+			Assert.Single(infos2);
+			Assert.Single(paths1);
+			Assert.Single(paths2);
 		}
 
 		[Fact]
@@ -664,16 +774,16 @@ namespace XUnitTest1.Traversals
 			var directorySearchOptions = new SafeTraversalDirectorySearchOptions { DirectoryNameOption = new SearchDirectoryByNameOption("e1") };
 
 			// Act
-			var result1 = safeTraversal.TraverseDirectories(dirinfo, searchOption, directorySearchOptions);
-			var result2 = dirinfo.GetDirectories(searchOption, directorySearchOptions);
-			var result3 = safeTraversal.TraverseDirectories(strpath, searchOption, directorySearchOptions);
-			var result4 = strpath.GetDirectories(searchOption, directorySearchOptions);
+			var infos1 = safeTraversal.TraverseDirectories(dirinfo, searchOption, directorySearchOptions);
+			var infos2 = dirinfo.GetDirectories(searchOption, directorySearchOptions);
+			var paths1 = safeTraversal.TraverseDirectories(strpath, searchOption, directorySearchOptions);
+			var paths2 = strpath.GetDirectories(searchOption, directorySearchOptions);
 
 			// Assert
-			Assert.Equal(1, result1?.Count());
-			Assert.Equal(1, result2?.Count());
-			Assert.Equal(1, result3?.Count());
-			Assert.Equal(1, result4?.Count());
+			Assert.Equal(1, infos1?.Count());
+			Assert.Equal(1, infos2?.Count());
+			Assert.Equal(1, paths1?.Count());
+			Assert.Equal(1, paths2?.Count());
 		}
 		#endregion
 
@@ -688,16 +798,16 @@ namespace XUnitTest1.Traversals
 			var searchOption = SearchOption.AllDirectories;
 
 			// Act
-			IEnumerable<DirectoryInfo> result1 = safeTraversal.TraverseDirectories(dirinfo, searchOption);
-			IEnumerable<DirectoryInfo> result2 = dirinfo.GetDirectories(searchOption);
-			IEnumerable<string> result3 = safeTraversal.TraverseDirectories(strpath, searchOption);
-			IEnumerable<string> result4 = strpath.GetDirectories(searchOption);
+			IEnumerable<DirectoryInfo> infos1 = safeTraversal.TraverseDirectories(dirinfo, searchOption);
+			IEnumerable<DirectoryInfo> infos2 = dirinfo.GetDirectories(searchOption);
+			IEnumerable<string> paths1 = safeTraversal.TraverseDirectories(strpath, searchOption);
+			IEnumerable<string> paths2 = strpath.GetDirectories(searchOption);
 
 			// Assert
-			Assert.Equal(667, result1?.Count());
-			Assert.Equal(667, result2?.Count());
-			Assert.Equal(667, result3?.Count());
-			Assert.Equal(667, result4?.Count());
+			Assert.Equal(667, infos1?.Count());
+			Assert.Equal(667, infos2?.Count());
+			Assert.Equal(667, paths1?.Count());
+			Assert.Equal(667, paths2?.Count());
 		}
 
 		[Fact]
@@ -712,16 +822,16 @@ namespace XUnitTest1.Traversals
 			Func<DirectoryInfo, bool> filter = x => x.Parent?.FullName == testdir;
 
 			// Act
-			var result1 = safeTraversal.TraverseDirectories(dirinfo, searchOption, filter);
-			var result2 = dirinfo.GetDirectories(searchOption, filter);
-			var result3 = safeTraversal.TraverseDirectories(strpath, searchOption, filter);
-			var result4 = strpath.GetDirectories(searchOption, filter);
+			var infos1 = safeTraversal.TraverseDirectories(dirinfo, searchOption, filter);
+			var infos2 = dirinfo.GetDirectories(searchOption, filter);
+			var paths1 = safeTraversal.TraverseDirectories(strpath, searchOption, filter);
+			var paths2 = strpath.GetDirectories(searchOption, filter);
 
 			// Assert
-			Assert.Equal(19, result1?.Count());
-			Assert.Equal(19, result2?.Count());
-			Assert.Equal(19, result3?.Count());
-			Assert.Equal(19, result4?.Count());
+			Assert.Equal(19, infos1?.Count());
+			Assert.Equal(19, infos2?.Count());
+			Assert.Equal(19, paths1?.Count());
+			Assert.Equal(19, paths2?.Count());
 		}
 
 		[Fact]
@@ -736,16 +846,16 @@ namespace XUnitTest1.Traversals
 			var attributes = FileAttributes.Archive | FileAttributes.Compressed; // FileAttributes.Directory;
 
 			// Act
-			var result1 = safeTraversal.TraverseDirectories(dirinfo, searchOption, attributes);
-			var result2 = dirinfo.GetDirectories(searchOption, attributes);
-			var result3 = safeTraversal.TraverseDirectories(strpath, searchOption, attributes);
-			var result4 = strpath.GetDirectories(searchOption, attributes);
+			var infos1 = safeTraversal.TraverseDirectories(dirinfo, searchOption, attributes);
+			var infos2 = dirinfo.GetDirectories(searchOption, attributes);
+			var paths1 = safeTraversal.TraverseDirectories(strpath, searchOption, attributes);
+			var paths2 = strpath.GetDirectories(searchOption, attributes);
 
 			// Assert
-			Assert.Equal(157, result1?.Count());
-			Assert.Equal(157, result2?.Count());
-			Assert.Equal(157, result3?.Count());
-			Assert.Equal(157, result4?.Count());
+			Assert.Equal(157, infos1?.Count());
+			Assert.Equal(157, infos2?.Count());
+			Assert.Equal(157, paths1?.Count());
+			Assert.Equal(157, paths2?.Count());
 		}
 
 		[Fact]
@@ -760,16 +870,16 @@ namespace XUnitTest1.Traversals
 			var searchDirectoryByDateOption = new SearchDirectoryByDateOption(new DateTime(2017, 03, 26), DateComparisonType.CreationDate);
 
 			// Act
-			var result1 = safeTraversal.TraverseDirectories(dirinfo, searchOption, searchDirectoryByDateOption);
-			var result2 = dirinfo.GetDirectories(searchOption, searchDirectoryByDateOption);
-			var result3 = safeTraversal.TraverseDirectories(strpath, searchOption, searchDirectoryByDateOption);
-			var result4 = strpath.GetDirectories(searchOption, searchDirectoryByDateOption);
+			var infos1 = safeTraversal.TraverseDirectories(dirinfo, searchOption, searchDirectoryByDateOption);
+			var infos2 = dirinfo.GetDirectories(searchOption, searchDirectoryByDateOption);
+			var paths1 = safeTraversal.TraverseDirectories(strpath, searchOption, searchDirectoryByDateOption);
+			var paths2 = strpath.GetDirectories(searchOption, searchDirectoryByDateOption);
 
 			// Assert
-			Assert.Equal(8, result1?.Count());
-			Assert.Equal(8, result2?.Count());
-			Assert.Equal(8, result3?.Count());
-			Assert.Equal(8, result4?.Count());
+			Assert.Equal(8, infos1?.Count());
+			Assert.Equal(8, infos2?.Count());
+			Assert.Equal(8, paths1?.Count());
+			Assert.Equal(8, paths2?.Count());
 		}
 
 		[Fact]
@@ -784,16 +894,16 @@ namespace XUnitTest1.Traversals
 			var searchDirectoryByName = new SearchDirectoryByNameOption("src");
 
 			// Act
-			var result1 = safeTraversal.TraverseDirectories(dirinfo, searchOption, searchDirectoryByName);
-			var result2 = dirinfo.GetDirectories(searchOption, searchDirectoryByName);
-			var result3 = safeTraversal.TraverseDirectories(strpath, searchOption, searchDirectoryByName);
-			var result4 = strpath.GetDirectories(searchOption, searchDirectoryByName);
+			var infos1 = safeTraversal.TraverseDirectories(dirinfo, searchOption, searchDirectoryByName);
+			var infos2 = dirinfo.GetDirectories(searchOption, searchDirectoryByName);
+			var paths1 = safeTraversal.TraverseDirectories(strpath, searchOption, searchDirectoryByName);
+			var paths2 = strpath.GetDirectories(searchOption, searchDirectoryByName);
 
 			// Assert
-			Assert.Equal(4, result1?.Count());
-			Assert.Equal(4, result2?.Count());
-			Assert.Equal(4, result3?.Count());
-			Assert.Equal(4, result4?.Count());
+			Assert.Equal(4, infos1?.Count());
+			Assert.Equal(4, infos2?.Count());
+			Assert.Equal(4, paths1?.Count());
+			Assert.Equal(4, paths2?.Count());
 		}
 
 		[Fact]
@@ -808,20 +918,20 @@ namespace XUnitTest1.Traversals
 			var searchDirectoryByRegularExpressionPattern = new SearchDirectoryByRegularExpressionOption(@"Diag$");
 
 			// Act
-			var result1 = safeTraversal.TraverseDirectories(dirinfo, searchOption, searchDirectoryByRegularExpressionPattern);
-			var result2 = dirinfo.GetDirectories(searchOption, searchDirectoryByRegularExpressionPattern);
-			var result3 = safeTraversal.TraverseDirectories(strpath, searchOption, searchDirectoryByRegularExpressionPattern);
-			var result4 = strpath.GetDirectories(searchOption, searchDirectoryByRegularExpressionPattern);
+			var infos1 = safeTraversal.TraverseDirectories(dirinfo, searchOption, searchDirectoryByRegularExpressionPattern);
+			var infos2 = dirinfo.GetDirectories(searchOption, searchDirectoryByRegularExpressionPattern);
+			var paths1 = safeTraversal.TraverseDirectories(strpath, searchOption, searchDirectoryByRegularExpressionPattern);
+			var paths2 = strpath.GetDirectories(searchOption, searchDirectoryByRegularExpressionPattern);
 
 			// Assert
-			//Assert.Equal(1, result1?.Count());
-			//Assert.Equal(1, result2?.Count());
-			//Assert.Equal(1, result3?.Count());
-			//Assert.Equal(1, result4?.Count());
-			Assert.Single(result1);
-			Assert.Single(result2);
-			Assert.Single(result3);
-			Assert.Single(result4);
+			//Assert.Equal(1, infos1?.Count());
+			//Assert.Equal(1, infos2?.Count());
+			//Assert.Equal(1, paths1?.Count());
+			//Assert.Equal(1, paths2?.Count());
+			Assert.Single(infos1);
+			Assert.Single(infos2);
+			Assert.Single(paths1);
+			Assert.Single(paths2);
 		}
 
 		[Fact]
@@ -836,16 +946,16 @@ namespace XUnitTest1.Traversals
 			var directorySearchOptions = new SafeTraversalDirectorySearchOptions { DirectoryNameOption = new SearchDirectoryByNameOption("bin") };
 
 			// Act
-			var result1 = safeTraversal.TraverseDirectories(dirinfo, searchOption, directorySearchOptions);
-			var result2 = dirinfo.GetDirectories(searchOption, directorySearchOptions);
-			var result3 = safeTraversal.TraverseDirectories(strpath, searchOption, directorySearchOptions);
-			var result4 = strpath.GetDirectories(searchOption, directorySearchOptions);
+			var infos1 = safeTraversal.TraverseDirectories(dirinfo, searchOption, directorySearchOptions);
+			var infos2 = dirinfo.GetDirectories(searchOption, directorySearchOptions);
+			var paths1 = safeTraversal.TraverseDirectories(strpath, searchOption, directorySearchOptions);
+			var paths2 = strpath.GetDirectories(searchOption, directorySearchOptions);
 
 			// Assert
-			Assert.Equal(14, result1?.Count());
-			Assert.Equal(14, result2?.Count());
-			Assert.Equal(14, result3?.Count());
-			Assert.Equal(14, result4?.Count());
+			Assert.Equal(14, infos1?.Count());
+			Assert.Equal(14, infos2?.Count());
+			Assert.Equal(14, paths1?.Count());
+			Assert.Equal(14, paths2?.Count());
 		}
 		#endregion
 	}

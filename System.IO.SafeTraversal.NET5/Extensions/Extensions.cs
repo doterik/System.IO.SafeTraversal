@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using static System.IO.SafeTraversal.Core.ExtendedExtensions;
+using static System.IO.SafeTraversal.Core.Helpers;
 using static System.IO.SafeTraversal.Core.SafeTraversal;
 
 namespace System.IO.SafeTraversal.Core
