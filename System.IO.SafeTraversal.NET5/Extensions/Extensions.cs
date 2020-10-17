@@ -324,7 +324,7 @@ namespace System.IO.SafeTraversal.Core
 		/// <returns>An IEnumerable of String.</returns>
 		/// <exception cref="ArgumentNullException">`path` cannot be null.</exception>
 		/// <exception cref="DirectoryNotFoundException">`path` doesn't exist.</exception>
-		public static IEnumerable<string> GetFiles(string path) => GetFiles(path, SearchOption.TopDirectoryOnly);
+		public static IEnumerable<string> GetFiles(this string path) => GetFiles(path, SearchOption.TopDirectoryOnly);
 
 		/// <summary>
 		/// Iterates files using search option.
@@ -334,7 +334,7 @@ namespace System.IO.SafeTraversal.Core
 		/// <returns>An IEnumerable of String.</returns>
 		/// <exception cref="ArgumentNullException">`path` cannot be null.</exception>
 		/// <exception cref="DirectoryNotFoundException">`path` doesn't exist.</exception>
-		public static IEnumerable<string> GetFiles(string path, SearchOption searchOption)
+		public static IEnumerable<string> GetFiles(this string path, SearchOption searchOption)
 		{
 			if (string.IsNullOrEmpty(path)) throw new ArgumentNullException(nameof(path), "`path` cannot be null");
 			if (!Directory.Exists(path)) throw new DirectoryNotFoundException($"{path} doesn't exist");
@@ -352,7 +352,7 @@ namespace System.IO.SafeTraversal.Core
 		/// <exception cref="ArgumentNullException">`path` cannot be null.</exception>
 		/// <exception cref="DirectoryNotFoundException">`path` doesn't exist.</exception>
 		/// <exception cref="ArgumentNullException">`filter` cannot be null.</exception>
-		public static IEnumerable<string> GetFiles(string path, SearchOption searchOption, Func<FileInfo, bool> filter)
+		public static IEnumerable<string> GetFiles(this string path, SearchOption searchOption, Func<FileInfo, bool> filter)
 		{
 			if (string.IsNullOrEmpty(path)) throw new ArgumentNullException(nameof(path), "`path` cannot be null");
 			if (!Directory.Exists(path)) throw new DirectoryNotFoundException($"{path} doesn't exist");
@@ -370,7 +370,7 @@ namespace System.IO.SafeTraversal.Core
 		/// <returns>An IEnumerable of String.</returns>
 		/// <exception cref="ArgumentNullException">`path` cannot be null.</exception>
 		/// <exception cref="DirectoryNotFoundException">`path` doesn't exist.</exception>
-		public static IEnumerable<string> GetFiles(string path, SearchOption searchOption, CommonSize commonSize)
+		public static IEnumerable<string> GetFiles(this string path, SearchOption searchOption, CommonSize commonSize)
 		{
 			return GetFiles(path, searchOption, fileInfo => MatchByCommonSize(fileInfo, commonSize));
 		}
@@ -385,7 +385,7 @@ namespace System.IO.SafeTraversal.Core
 		/// <exception cref="ArgumentNullException">`path` cannot be null.</exception>
 		/// <exception cref="DirectoryNotFoundException">`path` doesn't exist.</exception>
 		/// <exception cref="ArgumentNullException">`searchFileByName` cannot be null.</exception>
-		public static IEnumerable<string> GetFiles(string path, SearchOption searchOption, SearchFileByNameOption searchFileByName)
+		public static IEnumerable<string> GetFiles(this string path, SearchOption searchOption, SearchFileByNameOption searchFileByName)
 		{
 			if (searchFileByName is null) throw new ArgumentNullException(nameof(searchFileByName), "`searchFileByName` cannot be null");
 
@@ -402,7 +402,7 @@ namespace System.IO.SafeTraversal.Core
 		/// <exception cref="ArgumentNullException">`path` cannot be null.</exception>
 		/// <exception cref="DirectoryNotFoundException">`path` doesn't exist.</exception>
 		/// <exception cref="ArgumentNullException">`searchFileBySize` cannot be null.</exception>
-		public static IEnumerable<string> GetFiles(string path, SearchOption searchOption, SearchFileBySizeOption searchFileBySize)
+		public static IEnumerable<string> GetFiles(this string path, SearchOption searchOption, SearchFileBySizeOption searchFileBySize)
 		{
 			if (searchFileBySize is null) throw new ArgumentNullException(nameof(searchFileBySize), "`searchFileBySize` cannot be null");
 
@@ -419,7 +419,7 @@ namespace System.IO.SafeTraversal.Core
 		/// <exception cref="ArgumentNullException">`path` cannot be null.</exception>
 		/// <exception cref="DirectoryNotFoundException">`path` doesn't exist.</exception>
 		/// <exception cref="ArgumentNullException">`searchFileBySizeRange` cannot be null.</exception>
-		public static IEnumerable<string> GetFiles(string path, SearchOption searchOption, SearchFileBySizeRangeOption searchFileBySizeRange)
+		public static IEnumerable<string> GetFiles(this string path, SearchOption searchOption, SearchFileBySizeRangeOption searchFileBySizeRange)
 		{
 			if (searchFileBySizeRange is null) throw new ArgumentNullException(nameof(searchFileBySizeRange), "`searchFileBySizeRange` cannot be null");
 
@@ -436,7 +436,7 @@ namespace System.IO.SafeTraversal.Core
 		/// <exception cref="ArgumentNullException">`path` cannot be null.</exception>
 		/// <exception cref="DirectoryNotFoundException">`path` doesn't exist.</exception>
 		/// <exception cref="ArgumentNullException">`searchFileByDate` cannot be null.</exception>
-		public static IEnumerable<string> GetFiles(string path, SearchOption searchOption, SearchFileByDateOption searchFileByDate)
+		public static IEnumerable<string> GetFiles(this string path, SearchOption searchOption, SearchFileByDateOption searchFileByDate)
 		{
 			if (searchFileByDate is null) throw new ArgumentNullException(nameof(searchFileByDate), "`searchFileByDate` cannot be null");
 
@@ -453,7 +453,7 @@ namespace System.IO.SafeTraversal.Core
 		/// <exception cref="ArgumentNullException">`path` cannot be null.</exception>
 		/// <exception cref="DirectoryNotFoundException">`path` doesn't exist.</exception>
 		/// <exception cref="ArgumentNullException">`searchFileByDateRange` cannot be null.</exception>
-		public static IEnumerable<string> GetFiles(string path, SearchOption searchOption, SearchFileByDateRangeOption searchFileByDateRange)
+		public static IEnumerable<string> GetFiles(this string path, SearchOption searchOption, SearchFileByDateRangeOption searchFileByDateRange)
 		{
 			if (searchFileByDateRange is null) throw new ArgumentNullException(nameof(searchFileByDateRange), "`searchFileByDateRange` cannot be null");
 
@@ -470,7 +470,7 @@ namespace System.IO.SafeTraversal.Core
 		/// <exception cref="ArgumentNullException">`path` cannot be null.</exception>
 		/// <exception cref="DirectoryNotFoundException">`path` doesn't exist.</exception>
 		/// <exception cref="ArgumentNullException">`searchFileByRegularExpressionPattern` cannot be null.</exception>
-		public static IEnumerable<string> GetFiles(string path, SearchOption searchOption, SearchFileByRegularExpressionOption searchFileByRegularExpressionPattern)
+		public static IEnumerable<string> GetFiles(this string path, SearchOption searchOption, SearchFileByRegularExpressionOption searchFileByRegularExpressionPattern)
 		{
 			if (searchFileByRegularExpressionPattern is null) throw new ArgumentNullException(nameof(searchFileByRegularExpressionPattern), "`searchFileByRegularExpressionPattern` cannot be null");
 
@@ -487,7 +487,7 @@ namespace System.IO.SafeTraversal.Core
 		/// <exception cref="ArgumentNullException">`path` cannot be null.</exception>
 		/// <exception cref="DirectoryNotFoundException">`path` doesn't exist.</exception>
 		/// <exception cref="ArgumentNullException">`fileSearchOptions` cannot be null.</exception>
-		public static IEnumerable<string> GetFiles(string path, SearchOption searchOption, SafeTraversalFileSearchOptions fileSearchOptions)
+		public static IEnumerable<string> GetFiles(this string path, SearchOption searchOption, SafeTraversalFileSearchOptions fileSearchOptions)
 		{
 			if (fileSearchOptions is null) throw new ArgumentNullException(nameof(fileSearchOptions), "`fileSearchOptions` cannot be null");
 
@@ -501,7 +501,7 @@ namespace System.IO.SafeTraversal.Core
 		/// <returns>IEnumerable of String.</returns>
 		/// <exception cref="ArgumentNullException">`path` cannot be null.</exception>
 		/// <exception cref="DirectoryNotFoundException">`path` doesn't exist.</exception>
-		public static IEnumerable<string> GetDirectories(string path) => GetDirectories(path, SearchOption.TopDirectoryOnly);
+		public static IEnumerable<string> GetDirectories(this string path) => GetDirectories(path, SearchOption.TopDirectoryOnly);
 
 		/// <summary>
 		/// Iterate directories using search option.
@@ -511,7 +511,7 @@ namespace System.IO.SafeTraversal.Core
 		/// <returns>IEnumerable of String.</returns>
 		/// <exception cref="ArgumentNullException">`path` cannot be null.</exception>
 		/// <exception cref="DirectoryNotFoundException">`path` doesn't exist.</exception>
-		public static IEnumerable<string> GetDirectories(string path, SearchOption searchOption)
+		public static IEnumerable<string> GetDirectories(this string path, SearchOption searchOption)
 		{
 			if (string.IsNullOrEmpty(path)) throw new ArgumentNullException(nameof(path), "`path` cannot be null");
 			if (!Directory.Exists(path)) throw new DirectoryNotFoundException($"{path} doesn't exist");
@@ -529,7 +529,7 @@ namespace System.IO.SafeTraversal.Core
 		/// <exception cref="ArgumentNullException">`path` cannot be null.</exception>
 		/// <exception cref="DirectoryNotFoundException">`path` doesn't exist.</exception>
 		/// <exception cref="ArgumentNullException">`filter` cannot be null.</exception> 
-		public static IEnumerable<string> GetDirectories(string path, SearchOption searchOption, Func<DirectoryInfo, bool> filter)
+		public static IEnumerable<string> GetDirectories(this string path, SearchOption searchOption, Func<DirectoryInfo, bool> filter)
 		{
 			if (string.IsNullOrEmpty(path)) throw new ArgumentNullException(nameof(path), "`path` cannot be null");
 			if (!Directory.Exists(path)) throw new DirectoryNotFoundException($"{path} doesn't exist");
@@ -547,9 +547,9 @@ namespace System.IO.SafeTraversal.Core
 		/// <returns>IEnumerable of String.</returns>
 		/// <exception cref="ArgumentNullException">`path` cannot be null.</exception>
 		/// <exception cref="DirectoryNotFoundException">`path` doesn't exist.</exception>
-		public static IEnumerable<string> GetDirectories(string path, SearchOption searchOption, FileAttributes attributes)
+		public static IEnumerable<string> GetDirectories(this string path, SearchOption searchOption, FileAttributes attributes)
 		{
-			return GetDirectories(path, searchOption, dirInfo => MatchByAttributes(dirInfo, attributes)); // TODO: ArgumentException?
+			return GetDirectories(path, searchOption, dirInfo => MatchByAttributes(dirInfo, attributes));
 		}
 
 		/// <summary>
@@ -562,7 +562,7 @@ namespace System.IO.SafeTraversal.Core
 		/// <exception cref="ArgumentNullException">`path` cannot be null.</exception>
 		/// <exception cref="DirectoryNotFoundException">`path` doesn't exist.</exception>
 		/// <exception cref="ArgumentNullException">`searchDirectoryByDateOption` cannot be null.</exception> 
-		public static IEnumerable<string> GetDirectories(string path, SearchOption searchOption, SearchDirectoryByDateOption searchDirectoryByDateOption)
+		public static IEnumerable<string> GetDirectories(this string path, SearchOption searchOption, SearchDirectoryByDateOption searchDirectoryByDateOption)
 		{
 			if (searchDirectoryByDateOption is null) throw new ArgumentNullException(nameof(searchDirectoryByDateOption), "`searchDirectoryByDateOption` cannot be null");
 
@@ -579,7 +579,7 @@ namespace System.IO.SafeTraversal.Core
 		/// <exception cref="ArgumentNullException">`path` cannot be null.</exception>
 		/// <exception cref="DirectoryNotFoundException">`path` doesn't exist.</exception>
 		/// <exception cref="ArgumentNullException">`searchDirectoryByName` cannot be null.</exception> 
-		public static IEnumerable<string> GetDirectories(string path, SearchOption searchOption, SearchDirectoryByNameOption searchDirectoryByName)
+		public static IEnumerable<string> GetDirectories(this string path, SearchOption searchOption, SearchDirectoryByNameOption searchDirectoryByName)
 		{
 			if (searchDirectoryByName is null) throw new ArgumentNullException(nameof(searchDirectoryByName), "`searchDirectoryByName` cannot be null");
 
@@ -598,7 +598,7 @@ namespace System.IO.SafeTraversal.Core
 		/// <exception cref="ArgumentNullException">`path` cannot be null.</exception>
 		/// <exception cref="DirectoryNotFoundException">`path` doesn't exist.</exception>
 		/// <exception cref="ArgumentNullException">`searchDirectoryByRegularExpressionPattern` cannot be null.</exception> 
-		public static IEnumerable<string> GetDirectories(string path, SearchOption searchOption, SearchDirectoryByRegularExpressionOption searchDirectoryByRegularExpressionPattern)
+		public static IEnumerable<string> GetDirectories(this string path, SearchOption searchOption, SearchDirectoryByRegularExpressionOption searchDirectoryByRegularExpressionPattern)
 		{
 			if (searchDirectoryByRegularExpressionPattern is null) throw new ArgumentNullException(nameof(searchDirectoryByRegularExpressionPattern), "`searchDirectoryByRegularExpressionPattern` cannot be null");
 
@@ -615,7 +615,7 @@ namespace System.IO.SafeTraversal.Core
 		/// <exception cref="ArgumentNullException">`path` cannot be null.</exception>
 		/// <exception cref="DirectoryNotFoundException">`path` doesn't exist.</exception>
 		/// <exception cref="ArgumentNullException">`searchDirectoryByRegularExpressionPattern` cannot be null.</exception>
-		public static IEnumerable<string> GetDirectories(string path, SearchOption searchOption, SafeTraversalDirectorySearchOptions directorySearchOptions)
+		public static IEnumerable<string> GetDirectories(this string path, SearchOption searchOption, SafeTraversalDirectorySearchOptions directorySearchOptions)
 		{
 			if (directorySearchOptions is null) throw new ArgumentNullException(nameof(directorySearchOptions), "`searchDirectoryByRegularExpressionPattern` cannot be null");
 
@@ -623,6 +623,7 @@ namespace System.IO.SafeTraversal.Core
 		}
 		#endregion
 
+		#region Find Parents
 		/// <summary>
 		/// Find all parents all the way up to the root (ie: C:\ or D:\) from current path.
 		/// </summary>
@@ -657,5 +658,6 @@ namespace System.IO.SafeTraversal.Core
 				path = path.Parent;
 			}
 		}
+		#endregion
 	}
 }

@@ -634,7 +634,6 @@ namespace System.IO.SafeTraversal.Core
 		}
 		#endregion
 
-
 		#region Find Parents
 		/// <summary>
 		/// Find all parents all the way up to the root (ie: C:\ or D:\) from current path.

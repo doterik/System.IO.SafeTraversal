@@ -217,7 +217,7 @@ namespace System.IO.SafeTraversal.Core
 				{
 					dirs = filter is null
 						? Directory.GetDirectories(path)
-						: new DirectoryInfo(path).GetDirectories(path).Where(x => x.Pass(filter)).Select(x => x.FullName).ToArray();
+						: new DirectoryInfo(path).GetDirectories().Where(x => x.Pass(filter)).Select(x => x.FullName).ToArray();
 				}
 				catch (UnauthorizedAccessException ex)
 				{

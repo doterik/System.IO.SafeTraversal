@@ -32,7 +32,7 @@ namespace System.IO.SafeTraversal.Core
 		};
 
 		#region MatchBy
-		internal static bool MatchByAttributes(FileSystemInfo fileSystemInfo, FileAttributes fileAttributes) => fileSystemInfo.Attributes == fileAttributes; // Default..
+		internal static bool MatchByAttributes(FileSystemInfo fileSystemInfo, FileAttributes fileAttributes) => fileSystemInfo.Attributes.HasFlag(fileAttributes); // fileSystemInfo.Attributes & fileAttributes == fileAttributes
 
 		internal static bool MatchByCommonSize(FileInfo fileInfo, CommonSize commonSize) => commonSize switch
 		{
@@ -94,10 +94,20 @@ namespace System.IO.SafeTraversal.Core
 			var name = (fileSystemInfo is FileInfo && !withExtension) ? Path.GetFileNameWithoutExtension(fileSystemInfo.Name) : fileSystemInfo.Name;
 
 			bool result;
-			try { result = Regex.IsMatch(name, pattern, RegexOptions.Compiled); } // TODO: Compiled !?
+			try { result = Regex.IsMatch(name, pattern/*, RegexOptions.Compiled*/); } // TODO: Compiled !?
 			catch { result = false; }
 			return result;
 		}
+
+		//internal static bool MatchByPattern(string fileName, string pattern, bool withExtension = false) // TODO: Check this (fileName?).
+		//{
+		//	var name = (!withExtension) ? Path.GetFileNameWithoutExtension(fileName) : fileName;
+
+		//	bool result;
+		//	try { result = Regex.IsMatch(name, pattern/*, RegexOptions.Compiled*/); } // TODO: Compiled !?
+		//	catch { result = false; }
+		//	return result;
+		//}
 
 		internal static bool MatchBySize(FileInfo fileInfo, double size, SizeType sizeType)
 		{
